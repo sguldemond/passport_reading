@@ -9,9 +9,14 @@ reader = rm.waitForCard()
 
 print(reader)
 
-# mrz = mrz.MRZ('NXHF07F75ONLD9109032M2510262207074392<<<<<68')
-# print(mrz.checkMRZ()) 
+m1 = 'I<NLDIVPRB05R24119776170<<<<<36208107M2406237NLD<<<<<<<<<<<2'
+m2 = 'NXHF07F750NLD9109032M2510262207074392<<<<<68'
 
-# p = EPassport(mrz, reader)
+mrz_obj = mrz.MRZ(m2)
 
-# print(p["DG1"])
+print(mrz_obj.checkMRZ()) 
+
+p = EPassport(reader, m1)
+
+x = p.readPassport()
+print(x)
