@@ -18,16 +18,25 @@ Using [pcsc-tools](http://ludovic.rousseau.free.fr/softwares/pcsc-tools/) chips 
 
 ## Available projects
 
-ePassportViewer,
+### ePassportViewer
 - [Origin](https://github.com/andrew867/epassportviewer)
 - [GitHub mirror](https://github.com/andrew867/epassportviewer)
 
-supported by pypassport python library, which can be found in the same repository.
+It is supported by pypassport python library, which can be found in the same repository.
 
-There is a version of pypassport 2.0 available which claims:
+There is a [version of pypassport 2.0](https://github.com/landgenoot/pypassport-2.0) available which claims:
 > "added support for Dutch ECDSA Active Authentication"
-
-- [pypassport 2.0 by landgenoot](https://github.com/landgenoot/pypassport-2.0)
 
 These projects have been actively investigated. It takes some time to get all the needed software installed since main project was last updated 4 years ago. But the viewer and pypassport library are working.
 We get stuck at reading the passport information.
+
+To experiment with changes in the pypassport library you need to reinstall it every time.
+This is done inside a virtual environment.
+
+It clearly fails at pypassport-2.0 > reader > _autoDetect
+
+### JMRTD
+> "An Open Source Java Implementation of Machine Readable Travel Documents"
+
+Used by ReadID app.
+Has not been investigated yet.
