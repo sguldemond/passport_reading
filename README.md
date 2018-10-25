@@ -53,3 +53,8 @@ to pypassport > doc9303 > mrz.py > class MRZ > def _checkDigitsTD1 & def _checkD
 
 Used by ReadID app.
 Has not been investigated yet.
+
+
+## Relevant information
+
+The standard around Machine Readable Travel Documents can be found at [ICAO Doc 9303](https://www.icao.int/publications/pages/publication.aspx?docnum=9303)
