@@ -48,6 +48,32 @@ mrz = self._mrz
 ```
 to pypassport > doc9303 > mrz.py > class MRZ > def _checkDigitsTD1 & def _checkDigitsTD2
 
+#### Processing face image
+
+The face image is located in DG2 (DG is short for Data Group), corrosponding with tag '75', more info about this can be found at ICAO Doc 9303. It is formatted in jp2 (JPEG2000), so in order to use it properly it should be converted to another format like jpg or png.
+The pypassport module provides some code to do this, but in order for this to work some libraries have to installed first.
+Source: https://serverfault.com/questions/766324/imagemagick-and-openjpeg2
+```
+sudo apt-get install cmake
+wget https://github.com/uclouvain/openjpeg/archive/version.2.1.tar.gz
+tar xzf version.2.1.tar.gz
+cd openjpeg-version.2.1/
+cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
+make
+sudo make install
+
+sudo apt-get install libperl-dev
+wget http://www.imagemagick.org/download/ImageMagick.tar.gz
+tar xzf ImageMagick.tar.gz
+cd ImageMagick-6.9.3-8
+./configure --prefix=/usr --with-modules --with-perl=/usr/bin/perl --with-jp2 --enable-shared --disable-static --without-magick-plus-pus
+make
+sudo make install
+
+convert -list configure | grep DELEGATES
+```
+Check if openjp2 is in the list printed by the last command.
+
 ### JMRTD
 > "An Open Source Java Implementation of Machine Readable Travel Documents"
 
