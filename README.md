@@ -33,7 +33,20 @@ We get stuck at reading the passport information.
 To experiment with changes in the pypassport library you need to reinstall it every time.
 This is done inside a virtual environment.
 
-It clearly fails at pypassport-2.0 > reader > _autoDetect
+#### Changes we made so far
+
+Changing protocol from T0 to T1, based on experiments done using [gscriptor](ludovic.rousseau.free.fr/softwares/pcsc-tools/)
+```
+# self._pcsc_connection.connect(self.sc.scard.SCARD_PCI_T0)
+self._pcsc_connection.connect(self.sc.scard.SCARD_PCI_T1)
+```
+pypassport > reader.py > class PcscReader > def connect: 
+
+Adding this line,
+```
+mrz = self._mrz
+```
+to pypassport > doc9303 > mrz.py > class MRZ > def _checkDigitsTD1 & def _checkDigitsTD2
 
 ### JMRTD
 > "An Open Source Java Implementation of Machine Readable Travel Documents"
