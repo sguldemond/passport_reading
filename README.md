@@ -1,5 +1,14 @@
 # Passport reading
 
+## Run
+
+There must be a file present named `mrz.json` containing the MRZ of the document thats on the scanner.
+Also a folder named `output` must be present.
+
+```
+# python reader.py
+```
+
 ## Testing scanner
 
 The scanner we're using the [ACS ACR1252U-M1](https://www.acs.com.hk/en/products/342/acr1252u-usb-nfc-reader-iii-nfc-forum-certified-reader/) scanner, supported by the [CCID driver](https://ccid.apdu.fr/). All done on a Ubuntu machine.
