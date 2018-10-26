@@ -3,7 +3,7 @@ from pypassport.reader import ReaderManager, PcscReader
 from pypassport.openssl import OpenSSLException
 
 rm = ReaderManager()
-print(rm.getReaderList())
+# print(rm.getReaderList())
 
 reader = rm.waitForCard()
 
@@ -18,5 +18,7 @@ print(mrz_obj.checkMRZ())
 
 p = EPassport(reader, m1)
 
-x = p.readPassport()
+# x = p.readPassport()
+x = p.doBasicAccessControl()
+
 print(x)

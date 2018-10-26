@@ -1,0 +1,8 @@
+# folders
+.vscode/
+output/
+
+# file types
+*.pyc
+*.png
+*.jp2
