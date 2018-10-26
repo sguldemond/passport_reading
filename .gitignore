@@ -2,6 +2,9 @@
 .vscode/
 output/
 
+# files
+mrz.json
+
 # file types
 *.pyc
 *.png
