@@ -1,0 +1,22 @@
+install JasPer:
+
+# git clone https://github.com/xorgy/graphicsmagick
+# cd graphicsmagick/jp2
+# export CFLAGS="-O2 -fPIC"
+# ./configure
+# make
+# sudo make install
+
+install GraphicsMagick:
+
+# 'Download from web'
+# ./configure --with-modules --enable-shared=yes
+# make
+# sudo make install
+# ldconfig > 'For security and performance reasons, Linux maintains a cache of the shared libraries installed in "approved" locations and this command will update it.'
+
+check if GraphicsMagick includes JP2
+
+install pgmagick:
+# git clone https://github.com/hhatto/pgmagick
+# python setup.py install
