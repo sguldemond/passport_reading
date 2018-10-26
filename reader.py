@@ -14,8 +14,10 @@ print "Waiting for card..."
 reader = rm.waitForCard()
 # print(reader)
 
-mrz_idcard = 'I<NLDIVPRB05R24119776170<<<<<36208107M2406237NLD<<<<<<<<<<<2'
-mrz_passport = 'NXHF07F750NLD9109032M2510262207074392<<<<<68'
+with open('mrz.json') as input:
+    json_input = json.load(input)
+    mrz_idcard = json_input['id_card']
+    mrz_passport = json_input['passport']
 
 mrz_obj = mrz.MRZ(mrz_passport)
 
