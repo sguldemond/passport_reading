@@ -6,7 +6,7 @@ There must be a file present named `mrz.json` containing the MRZ of the document
 Also a folder named `output` must be present.
 
 ```
-# python reader.py
+$ python reader.py
 ```
 
 ## Testing scanner
@@ -14,16 +14,16 @@ Also a folder named `output` must be present.
 The scanner we're using the [ACS ACR1252U-M1](https://www.acs.com.hk/en/products/342/acr1252u-usb-nfc-reader-iii-nfc-forum-certified-reader/) scanner, supported by the [CCID driver](https://ccid.apdu.fr/). All done on a Ubuntu machine.
 
 List all USB devices:
-`# lsusb`
+`$ lsusb`
 
 Using the [PCSC-lite](https://pcsclite.apdu.fr/) daemon `pcscd` you can check if the driver is compatible with a NFC scanner:
-`# sudo pcscd -f -d`
+`$ sudo pcscd -f -d`
 
 Start PCSC in the background:
-`# service pcscd start`
+`$ service pcscd start`
 
 Using [pcsc-tools](http://ludovic.rousseau.free.fr/softwares/pcsc-tools/) chips on the scanner can be read, PCSC needs te be started for this:
-`# pcsc_scan`
+`$ pcsc_scan`
 
 ## Available projects
 
@@ -67,33 +67,33 @@ First install (JasPer)[http://www.ece.uvic.ca/~frodo/jasper/], this used by Grap
 It is available (here)[https://github.com/mdadams/jasper], but I had trouble building it from here.
 
 ```
-# git clone https://github.com/xorgy/graphicsmagick // this is a large download, but couldn't get it working otherwise
-# cd graphicsmagick/jp2
-# export CFLAGS="-O2 -fPIC" // this is important later when installing GraphicsMagick
-# ./configure
-# make
-# sudo make install
+$ git clone https://github.com/xorgy/graphicsmagick // this is a large download, but couldn't get it working otherwise
+$ cd graphicsmagick/jp2
+$ export CFLAGS="-O2 -fPIC" // this is important later when installing GraphicsMagick
+$ ./configure
+$ make
+$ sudo make install
 ```
 
 Then install GraphicsMagick, image processing software, from anywhere (here)[http://www.graphicsmagick.org/download.html], I used version 1.3.30.
 ```
-# 'Download from web & enter folder'
-# ./configure --with-modules --enable-shared=yes // is has to be shared in order for pgmagick to use it
-# make
-# sudo make install
-# ldconfig // 'For security and performance reasons, Linux maintains a cache of the shared libraries installed in "approved" locations and this command will update it.'
+$ 'Download from web & enter folder'
+$ ./configure --with-modules --enable-shared=yes // is has to be shared in order for pgmagick to use it
+$ make
+$ sudo make install
+$ ldconfig // 'For security and performance reasons, Linux maintains a cache of the shared libraries installed in "approved" locations and this command will update it.'
 ```
 
 GraphicsMagick should support JPEG2000 now, you can check this by running:
 ```
-# gm version
+$ gm version
 ```
 It should list `JPEG-2000 ... yes` under `Feature Support`.
 
 Finally install (pgmagick)[https://github.com/hhatto/pgmagick], which is a boost.python based wrapper for GraphicsMagick
 ```
-# git clone https://github.com/hhatto/pgmagick
-# python setup.py install
+$ git clone https://github.com/hhatto/pgmagick
+$ python setup.py install
 ```
 Do not install pgmagick through `pip`, this version includes its own version of GraphicsMagick which will not support JPEG2000.
 
