@@ -63,8 +63,8 @@ The face image is located in DG2 (DG is short for Data Group), corrosponding wit
 
 The pypassport module provides some code thats shows how to do this, but in order for this to work some libraries have to installed first.
 
-First install (JasPer)[http://www.ece.uvic.ca/~frodo/jasper/], this used by GraphicsMagick and handles JPEG2000 files
-It is available (here)[https://github.com/mdadams/jasper], but I had trouble building it from here.
+First install [JasPer](http://www.ece.uvic.ca/~frodo/jasper/), this used by GraphicsMagick and handles JPEG2000 files
+It is available [here](https://github.com/mdadams/jasper), but I had trouble building it from here.
 
 ```
 $ git clone https://github.com/xorgy/graphicsmagick // this is a large download, but couldn't get it working otherwise
@@ -75,7 +75,7 @@ $ make
 $ sudo make install
 ```
 
-Then install GraphicsMagick, image processing software, from anywhere (here)[http://www.graphicsmagick.org/download.html], I used version 1.3.30.
+Then install GraphicsMagick, image processing software, from anywhere [here](http://www.graphicsmagick.org/download.html), I used version 1.3.30.
 ```
 $ 'Download from web & enter folder'
 $ ./configure --with-modules --enable-shared=yes // is has to be shared in order for pgmagick to use it
@@ -90,7 +90,7 @@ $ gm version
 ```
 It should list `JPEG-2000 ... yes` under `Feature Support`.
 
-Finally install (pgmagick)[https://github.com/hhatto/pgmagick], which is a boost.python based wrapper for GraphicsMagick
+Finally install [pgmagick](https://github.com/hhatto/pgmagick), which is a boost.python based wrapper for GraphicsMagick
 ```
 $ git clone https://github.com/hhatto/pgmagick
 $ python setup.py install
