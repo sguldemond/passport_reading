@@ -11,10 +11,9 @@ $ python reader.py
 
 ## Testing scanner
 
-The scanner we're using the [ACS ACR1252U-M1](https://www.acs.com.hk/en/products/342/acr1252u-usb-nfc-reader-iii-nfc-forum-certified-reader/) scanner, supported by the [CCID driver](https://ccid.apdu.fr/). All done on a Ubuntu machine.
+The scanner we're using is the [ACS ACR1252U-M1](https://www.acs.com.hk/en/products/342/acr1252u-usb-nfc-reader-iii-nfc-forum-certified-reader/), supported by the [CCID driver](https://ccid.apdu.fr/). All done on an Ubuntu 18.04 machine.
 
-List all USB devices:
-`$ lsusb`
+List all USB devices: `$ lsusb`
 
 Using the [PCSC-lite](https://pcsclite.apdu.fr/) daemon `pcscd` you can check if the driver is compatible with a NFC scanner:
 `$ sudo pcscd -f -d`
@@ -31,13 +30,10 @@ Using [pcsc-tools](http://ludovic.rousseau.free.fr/softwares/pcsc-tools/) chips 
 - [Origin](https://github.com/andrew867/epassportviewer)
 - [GitHub mirror](https://github.com/andrew867/epassportviewer)
 
-It is supported by pypassport python library, which can be found in the same repository.
-
-There is a [version of pypassport 2.0](https://github.com/landgenoot/pypassport-2.0) available which claims:
-> "added support for Dutch ECDSA Active Authentication"
+It is supported by the pypassport python library, which can be found in the same repository.
 
 These projects have been actively investigated. It takes some time to get all the needed software installed since main project was last updated 4 years ago. But the viewer and pypassport library are working.
-We get stuck at reading the passport information.
+We got stuck at reading the passport information.
 
 To experiment with changes in the pypassport library you need to reinstall it every time.
 This is done inside a virtual environment.
@@ -61,10 +57,10 @@ to pypassport > doc9303 > mrz.py > class MRZ > def _checkDigitsTD1 & def _checkD
 
 The face image is located in DG2 (DG is short for Data Group), corrosponding with tag '75', more info about this can be found at ICAO Doc 9303. It is formatted in JPEG2000 (jp2), so in order to use it properly it should be converted to another format like jpg or png.
 
-The pypassport module provides some code thats shows how to do this, but in order for this to work some libraries have to installed first.
+The pypassport module provides some code thats shows how to do this, but in order for this to work some libraries have to be installed first.
 
-First install [JasPer](http://www.ece.uvic.ca/~frodo/jasper/), this used by GraphicsMagick and handles JPEG2000 files
-It is available [here](https://github.com/mdadams/jasper), but I had trouble building it from here.
+First install [JasPer](http://www.ece.uvic.ca/~frodo/jasper/), this is used by GraphicsMagick and handles JPEG2000 files
+It is available [here](https://github.com/mdadams/jasper), but the build and install process is quite unfriendly. I ended up with the following process:
 
 ```
 $ git clone https://github.com/xorgy/graphicsmagick // this is a large download, but couldn't get it working otherwise
@@ -90,7 +86,7 @@ $ gm version
 ```
 It should list `JPEG-2000 ... yes` under `Feature Support`.
 
-Finally install [pgmagick](https://github.com/hhatto/pgmagick), which is a boost.python based wrapper for GraphicsMagick
+Finally install [pgmagick](https://github.com/hhatto/pgmagick), which is a "boost.python based wrapper for GraphicsMagick" 
 ```
 $ git clone https://github.com/hhatto/pgmagick
 $ python setup.py install
@@ -99,6 +95,7 @@ Do not install pgmagick through `pip`, this version includes its own version of 
 
 ### JMRTD
 > "An Open Source Java Implementation of Machine Readable Travel Documents"
+- [Homepage](https://jmrtd.org/)
 
 Used by ReadID app.
 Has not been investigated yet.
