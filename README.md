@@ -77,6 +77,9 @@ for tag in ef_com:
  ###
 ```
 
+For some reason DG15 returns empty and for DG3 the 'securty status is not satisfied'.
+For now this can be skipped, with the info from DG15 (public keys) the info on the NFC can be varified as valid, but this is not relevant for us at this moment. We also don't need DG3 (Finger Print).
+
 #### Processing face image
 
 The face image is located in DG2 (DG is short for Data Group), corrosponding with tag '75', more info about this can be found at ICAO Doc 9303. It is formatted in JPEG2000 (jp2), so in order to use it properly it should be converted to another format like jpg or png.
@@ -123,7 +126,6 @@ Do not install pgmagick through `pip`, this version includes its own version of 
 
 Used by ReadID app.
 Has not been investigated yet.
-
 
 ## Relevant information
 
