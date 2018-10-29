@@ -3,6 +3,7 @@ from pypassport.reader import ReaderManager, PcscReader
 from pypassport import jp2converter
 from pypassport.doc9303 import tagconverter
 from imageHandler import convert_image
+from encryptionHandler import encrypt_data
 
 import json
 import os
@@ -40,7 +41,13 @@ for attribute, value in dg1_data.iteritems():
     tag_name = tagconverter.tagToName[attribute]
     clean_info.update({tag_name: value})
 
-print(clean_info)
+# print(clean_info)
+
+with open('zenroom/pub_key.keys', 'r') as input:
+    public_key = input.read()
+
+data = encrypt_data(json.dumps(clean_info, ensure_ascii=False), public_key)
+print(data)
 
 with open('output/' + doc_number + '.json', 'w') as outfile:
     json.dump(clean_info, outfile)
