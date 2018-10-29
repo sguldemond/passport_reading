@@ -101,7 +101,7 @@ $ sudo make install
 Then install GraphicsMagick, image processing software, from anywhere [here](http://www.graphicsmagick.org/download.html), I used version 1.3.30.
 ```
 $ 'Download from web & enter folder'
-$ ./configure --with-modules --enable-shared=yes // is has to be shared in order for pgmagick to use it
+$ ./configure --with-modules --enable-shared=yes --disable-installed=yes // is has to be shared in order for pgmagick to use it
 $ make
 $ sudo make install
 $ ldconfig // 'For security and performance reasons, Linux maintains a cache of the shared libraries installed in "approved" locations and this command will update it.'
