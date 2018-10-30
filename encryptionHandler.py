@@ -1,7 +1,6 @@
 import os, sys, select, ctypes
 
 ### source: https://stackoverflow.com/questions/9488560/capturing-print-output-from-shared-library-called-from-python-with-ctypes-module #
-
 def setup_pipe():
     global pipe_out, pipe_in, stdout
     sys.stdout.write(' \b')
@@ -21,7 +20,7 @@ def read_pipe():
     return out
 ###
 
-# Init shared library
+# Init Zenroom shared library
 _zenroom = ctypes.CDLL('zenroom/_zenroom.so')
 
 # Get script
@@ -33,13 +32,3 @@ def encrypt_data(data, keys):
     _zenroom.zenroom_exec(script, None, keys, data, 1) # params: script, conf, keys, data, verbosity
     os.dup2(stdout, 1)
     return read_pipe()
-
-# Will come from PWA
-with open('zenroom/pub_key.keys', 'r') as input:
-    public_key = input.read()
-
-# Personal data from user
-testData = "Whatever"
-
-# output = encrypt_data(testData, public_key)
-# print(output)

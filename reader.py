@@ -27,11 +27,8 @@ print(mrz_obj.checkMRZ())
 
 epassport = EPassport(reader, mrz_passport)
 
-print(epassport.readCom())
-
 print "Reading DG1 (MRZ)..."
 dg1_data = epassport['DG1']
-# print(dg1_data)
 
 doc_number_tag = '5A' # see https://www.icao.int/publications/Documents/9303_p10_cons_en.pdf for more info
 doc_number = dg1_data[doc_number_tag]
@@ -42,12 +39,6 @@ for attribute, value in dg1_data.iteritems():
     clean_info.update({tag_name: value})
 
 # print(clean_info)
-
-with open('zenroom/pub_key.keys', 'r') as input:
-    public_key = input.read()
-
-data = encrypt_data(json.dumps(clean_info, ensure_ascii=False), public_key)
-print(data)
 
 with open('output/' + doc_number + '.json', 'w') as outfile:
     json.dump(clean_info, outfile)
@@ -62,6 +53,17 @@ elif dg2_data['A1'].has_key('7F2E'): tag = '7F2E' # 7F2E: Biometric data block (
 img_data = dg2_data['A1'][tag]
 
 print "Starting conversion..."
-convert_image(img_data, doc_number)
+image_string = convert_image(img_data, doc_number)
 
-# print(epassport.readPassport())
+# clean_info.update({"image": image_string})
+# print(clean_info)
+# with open('zenroom/info.data', 'w') as outfile:
+#     json.dump(clean_info, outfile)
+
+### Encryption ###
+with open('zenroom/pub_key.keys', 'r') as input:
+    external_pub_key = input.read()
+
+data = encrypt_data(json.dumps(clean_info, ensure_ascii=False), external_pub_key)
+print(data)
+###
