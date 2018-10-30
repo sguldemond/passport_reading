@@ -29,6 +29,11 @@ with open('zenroom/encrypt_message.lua', 'r') as input:
  
 def encrypt_data(data, keys):
     setup_pipe()
-    _zenroom.zenroom_exec(script, None, keys, data, 1) # params: script, conf, keys, data, verbosity
+    _zenroom.zenroom_exec_tobuf(
+        # script, conf, keys, data, verbosity
+          script, None, keys, data, 1,
+        # stdout_buf, stdout_len, stderr_buf, stderr_len
+          "",         "",         "",         ""
+        ) 
     os.dup2(stdout, 1)
     return read_pipe()

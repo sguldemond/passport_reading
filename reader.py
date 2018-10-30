@@ -4,6 +4,7 @@ from pypassport import jp2converter
 from pypassport.doc9303 import tagconverter
 from imageHandler import convert_image
 from encryptionHandler import encrypt_data
+from zenroom import execute
 
 import json
 import os
@@ -53,7 +54,7 @@ elif dg2_data['A1'].has_key('7F2E'): tag = '7F2E' # 7F2E: Biometric data block (
 img_data = dg2_data['A1'][tag]
 
 print "Starting conversion..."
-image_string = convert_image(img_data, doc_number)
+# image_string = convert_image(img_data, doc_number)
 
 # clean_info.update({"image": image_string})
 # print(clean_info)
@@ -64,6 +65,12 @@ image_string = convert_image(img_data, doc_number)
 with open('zenroom/pub_key.keys', 'r') as input:
     external_pub_key = input.read()
 
-data = encrypt_data(json.dumps(clean_info, ensure_ascii=False), external_pub_key)
+# data = encrypt_data(json.dumps(clean_info, ensure_ascii=False), external_pub_key)
+
+with open('zenroom/encrypt_message.lua', 'r') as input:
+    script = input.read()
+
+data = execute(script, external_pub_key, json.dumps(clean_info))
 print(data)
 ###
+
