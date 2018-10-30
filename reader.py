@@ -2,9 +2,10 @@ from pypassport.epassport import EPassport, mrz
 from pypassport.reader import ReaderManager, PcscReader
 from pypassport import jp2converter
 from pypassport.doc9303 import tagconverter
-from imageHandler import convert_image
-from encryptionHandler import encrypt_data
-from zenroom import execute
+
+from image_handler import convert_image
+import zenroom_pipe
+import zenroom_buffer
 
 import json
 import os
@@ -54,7 +55,7 @@ elif dg2_data['A1'].has_key('7F2E'): tag = '7F2E' # 7F2E: Biometric data block (
 img_data = dg2_data['A1'][tag]
 
 print "Starting conversion..."
-# image_string = convert_image(img_data, doc_number)
+image_string = convert_image(img_data, doc_number)
 
 # clean_info.update({"image": image_string})
 # print(clean_info)
@@ -62,15 +63,14 @@ print "Starting conversion..."
 #     json.dump(clean_info, outfile)
 
 ### Encryption ###
+with open('zenroom/encrypt_message.lua', 'r') as input:
+    encryption_script = input.read()
+
 with open('zenroom/pub_key.keys', 'r') as input:
     external_pub_key = input.read()
 
-# data = encrypt_data(json.dumps(clean_info, ensure_ascii=False), external_pub_key)
+# data = zenroom_pipe.execute(encryption_script, external_pub_key, json.dumps(clean_info, ensure_ascii=False))
+data = zenroom_buffer.execute(encryption_script, external_pub_key, json.dumps(clean_info))
 
-with open('zenroom/encrypt_message.lua', 'r') as input:
-    script = input.read()
-
-data = execute(script, external_pub_key, json.dumps(clean_info))
 print(data)
 ###
-
