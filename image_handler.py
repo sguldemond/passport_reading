@@ -15,12 +15,12 @@ def convert_image(img_data, output_name, output=True):
     output_folder = "output"
     file = "{0}/{1}.{2}".format(output_folder, output_name, file_type)
     
+    main_img.write(file)
+
     with open(file, 'r') as input:
         base64_image = base64.b64encode(input.read())
-
-    if output:
-        main_img.write(file)
-    else:
+        
+    if output == False:
         os.remove(file)
     
     return base64_image
