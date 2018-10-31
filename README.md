@@ -92,7 +92,7 @@ It is available [here](https://github.com/mdadams/jasper), but the build and ins
 ```
 $ git clone https://github.com/xorgy/graphicsmagick
 $ cd graphicsmagick/jp2
-$ export CFLAGS="-O2 -fPIC" // this is important later when installing GraphicsMagick
+$ export CFLAGS="-O2 -fPIC"
 $ ./configure
 $ make
 $ sudo make install
