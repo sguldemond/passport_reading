@@ -104,7 +104,7 @@ $ 'Download from web & enter folder'
 $ ./configure --with-modules --enable-shared=yes --disable-installed
 $ make
 $ sudo make install
-$ ldconfig // 'For security and performance reasons, Linux maintains a cache of the shared libraries installed in "approved" locations and this command will update it.'
+$ sudo ldconfig // 'For security and performance reasons, Linux maintains a cache of the shared libraries installed in "approved" locations and this command will update it.'
 ```
 
 GraphicsMagick should support JPEG2000 now, you can check this by running:
