@@ -1,11 +1,6 @@
-from pypassport.epassport import EPassport, mrz
-from pypassport.reader import ReaderManager, PcscReader
-from pypassport.doc9303 import tagconverter
-
-from image_handler import convert_image
+from passport import Passport
 import zenroom_pipe
 import zenroom_buffer
-from passport import Passport
 
 import os, json
 

@@ -1,26 +1,30 @@
 from PIL import Image
+from io import BytesIO
 import os, base64
+import cStringIO
+from shutil import copyfileobj
 
 def convert_image(img_data, output_name, output=True):
     with open('tmp.jp2', 'wb') as input:
         input.write(img_data)
     
     main_img = Image.open('tmp.jp2')
-    os.remove('tmp.jp2') # no need for temp file
-
-    file_type = 'jpg'
-    output_folder = 'output'
-    file = '{0}/{1}.{2}'.format(output_folder, output_name, file_type)
+    os.remove('tmp.jp2')
     
-    main_img.resize(((main_img.size[0] / 3), (main_img.size[1] / 3)), Image.ANTIALIAS)
+    main_img = main_img.resize(((main_img.size[0] / 3), (main_img.size[1] / 3)), Image.ANTIALIAS)
 
-    main_img.save(file)
+    output_format = 'jpeg'
+    buffer = cStringIO.StringIO()
+    main_img.save(buffer, format=output_format)
+    base64_image = base64.b64encode(buffer.getvalue())
 
+    if output:
+        output_folder = 'output'
+        file = '{0}/{1}.{2}'.format(output_folder, output_name, output_format)
 
-    with open(file, 'r') as input:
-        base64_image = base64.b64encode(input.read())
+        with open(file, 'w') as output:
+            buffer.seek(0)
+            copyfileobj(buffer, output)
         
-    if output == False:
-        os.remove(file)
-    
+    buffer.close()
     return base64_image

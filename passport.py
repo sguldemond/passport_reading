@@ -1,9 +1,7 @@
-# pypassport
 from pypassport.reader import ReaderManager
 from pypassport.epassport import EPassport, mrz
 from pypassport.doc9303 import tagconverter
 
-# local
 from image_handler import convert_image
 
 import json
