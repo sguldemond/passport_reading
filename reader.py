@@ -1,6 +1,5 @@
 from pypassport.epassport import EPassport, mrz
 from pypassport.reader import ReaderManager, PcscReader
-from pypassport import jp2converter
 from pypassport.doc9303 import tagconverter
 
 from image_handler import convert_image
@@ -59,6 +58,7 @@ image_string = convert_image(img_data, doc_number)
 
 # clean_info.update({"image": image_string})
 # print(clean_info)
+
 # with open('zenroom/info.data', 'w') as outfile:
 #     json.dump(clean_info, outfile)
 
