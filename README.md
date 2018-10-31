@@ -90,7 +90,7 @@ First install [JasPer](http://www.ece.uvic.ca/~frodo/jasper/), this is used by G
 It is available [here](https://github.com/mdadams/jasper), but the build and install process is quite unfriendly. I ended up with the following process:
 
 ```
-$ git clone https://github.com/xorgy/graphicsmagick // this is a large download, but couldn't get it working otherwise
+$ git clone https://github.com/xorgy/graphicsmagick
 $ cd graphicsmagick/jp2
 $ export CFLAGS="-O2 -fPIC" // this is important later when installing GraphicsMagick
 $ ./configure
@@ -101,7 +101,7 @@ $ sudo make install
 Then install GraphicsMagick, image processing software, from anywhere [here](http://www.graphicsmagick.org/download.html), I used version 1.3.30.
 ```
 $ 'Download from web & enter folder'
-$ ./configure --with-modules --enable-shared=yes --disable-installed=yes // is has to be shared in order for pgmagick to use it
+$ ./configure --with-modules --enable-shared=yes --disable-installed
 $ make
 $ sudo make install
 $ ldconfig // 'For security and performance reasons, Linux maintains a cache of the shared libraries installed in "approved" locations and this command will update it.'
