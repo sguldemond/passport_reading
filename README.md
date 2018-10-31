@@ -116,6 +116,7 @@ It should list `JPEG-2000 ... yes` under `Feature Support`.
 Finally install [pgmagick](https://github.com/hhatto/pgmagick), which is a "boost.python based wrapper for GraphicsMagick" 
 ```
 $ git clone https://github.com/hhatto/pgmagick
+$ cd pgmagick
 $ python setup.py install
 ```
 Do not install pgmagick through `pip`, this version includes its own version of GraphicsMagick which will not support JPEG2000.
