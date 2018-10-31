@@ -4,6 +4,7 @@ output/
 
 # files
 mrz.json
+config.json
 
 # file types
 *.pyc

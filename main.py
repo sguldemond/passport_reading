@@ -9,15 +9,14 @@ from passport import Passport
 
 import os, json
 
-with open('mrz.json') as input:
+with open('config.json') as input:
     json_input = json.load(input)
-    mrz_idcard = json_input['id_card']
-    mrz_passport = json_input['passport']
+    mrz_string = json_input['mrz']
 
-
-id_card = Passport(mrz_passport, "", False)
+id_card = Passport(mrz_string, True)
 personal_data = id_card.personal_data()
-image = id_card.image()
+image_base64 = id_card.image()
+# print(image_base64)
 
 ### Encryption ###
 with open('zenroom/encrypt_message.lua', 'r') as input:

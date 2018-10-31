@@ -1,21 +1,21 @@
-from pgmagick import Image
+from PIL import Image
 import os, base64
 
 def convert_image(img_data, output_name, output=True):
-    temp_img = open("tmp.jp2", "wb") # wb = write in binary
-    temp_img.write(img_data)
-    temp_img.close()
-
-    main_img = Image('tmp.jp2') # input tmp image file
-    os.remove("tmp.jp2") # no need for temp file
+    with open('tmp.jp2', 'wb') as input:
+        input.write(img_data)
+    
+    main_img = Image.open('tmp.jp2')
+    os.remove('tmp.jp2') # no need for temp file
 
     file_type = 'jpg'
-    print("Converting jp2 to {} image...".format(file_type))
-
-    output_folder = "output"
-    file = "{0}/{1}.{2}".format(output_folder, output_name, file_type)
+    output_folder = 'output'
+    file = '{0}/{1}.{2}'.format(output_folder, output_name, file_type)
     
-    main_img.write(file)
+    main_img.resize(((main_img.size[0] / 3), (main_img.size[1] / 3)), Image.ANTIALIAS)
+
+    main_img.save(file)
+
 
     with open(file, 'r') as input:
         base64_image = base64.b64encode(input.read())

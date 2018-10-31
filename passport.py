@@ -9,9 +9,8 @@ from image_handler import convert_image
 import json
 
 class Passport:
-    def __init__(self, mrz, reader_type="ACR1252U", output=False):
+    def __init__(self, mrz, output=False):
         self.mrz_string = mrz
-        self.reader_type = reader_type
         self.output = output
         self.reader_obj = None
     
@@ -22,6 +21,7 @@ class Passport:
         rm = ReaderManager()
         print "Waiting for card..."
         self.reader_obj = rm.waitForCard()
+        print "Card detected!"
     
     def _check_mrz(self):
         mrz_obj = mrz.MRZ(self.mrz_string)
@@ -65,6 +65,7 @@ class Passport:
             print "EPassport not set"
             return
 
+        print "Getting image from NFC, this might take a while..."
         dg2_data = self.epassport['DG2']
 
         # check from ePassportviewer
@@ -78,6 +79,6 @@ class Passport:
             doc_number_tag = '5A'
             output_name = dg1_data[doc_number_tag]
         else:
-            output_name = "tmp"
+            output_name = 'tmp'
 
         return convert_image(img_data, output_name, self.output)
