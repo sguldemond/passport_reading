@@ -1,5 +1,5 @@
 from passport import Passport
-import zenroom_pipe
+# import zenroom_pipe
 import zenroom_buffer
 
 import os, json
@@ -20,7 +20,12 @@ with open('zenroom/encrypt_message.lua', 'r') as input:
 with open('zenroom/pub_key.keys', 'r') as input:
     external_pub_key = input.read()
 
-data_to_encrypt = personal_data
+data_to_encrypt = []
+data_to_encrypt.append({'personal_data': personal_data})
+data_to_encrypt.append({'image_base64': image_base64})
+
+with open('zenroom/test_data.json', 'w') as output:
+    json.dump(data_to_encrypt, output)
 
 # data = zenroom_pipe.execute(encryption_script, external_pub_key, json.dumps(clean_info, ensure_ascii=False))
 data = zenroom_buffer.execute(encryption_script, external_pub_key, json.dumps(data_to_encrypt))

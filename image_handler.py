@@ -1,8 +1,7 @@
 from PIL import Image
-from io import BytesIO
-import os, base64
-import cStringIO
+from cStringIO import StringIO
 from shutil import copyfileobj
+import os, base64
 
 def convert_image(img_data, output_name, output=True):
     with open('tmp.jp2', 'wb') as input:
@@ -14,7 +13,7 @@ def convert_image(img_data, output_name, output=True):
     main_img = main_img.resize(((main_img.size[0] / 3), (main_img.size[1] / 3)), Image.ANTIALIAS)
 
     output_format = 'jpeg'
-    buffer = cStringIO.StringIO()
+    buffer = StringIO()
     main_img.save(buffer, format=output_format)
     base64_image = base64.b64encode(buffer.getvalue())
 
