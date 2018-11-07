@@ -14,8 +14,8 @@ header['pub_key'] = internal_key:public():base64()
 
 -- payload is encrypted with server public key so only server can read it with own private key
 -- header is signed? so server can check it with added public key? 
-output = ECDH.encrypt(internal_key:public(), base64(external_key.public), str(MSG.pack(payload)), str(MSG.pack(header)))
-output = map(output, O.to_base64)
+output = ECDH.encrypt(internal_key, base64(external_key.public), str(MSG.pack(payload)), str(MSG.pack(header)))
+output = map(output, base64)
 output.zenroom = VERSION
 output.encoding = 'base64'
 output.curve = curve
