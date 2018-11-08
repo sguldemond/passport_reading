@@ -8,9 +8,11 @@ with open('config.json') as input:
     json_input = json.load(input)
     mrz_string = json_input['mrz']
 
+# mrz_string = ["NXHF07F75", "910903", "251026"]
+
 id_card = Passport(mrz_string, True)
 personal_data = id_card.personal_data()
-image_base64 = id_card.image()
+# image_base64 = id_card.photo_data()
 # print(image_base64)
 
 ### Encryption ###
@@ -22,7 +24,9 @@ with open('zenroom/pub_key.keys', 'r') as input:
 
 data_to_encrypt = []
 data_to_encrypt.append({'personal_data': personal_data})
-data_to_encrypt.append({'image_base64': image_base64})
+# data_to_encrypt.append({'image_base64': image_base64})
+
+
 
 with open('zenroom/test_data.json', 'w') as output:
     json.dump(data_to_encrypt, output)
@@ -30,5 +34,7 @@ with open('zenroom/test_data.json', 'w') as output:
 # data = zenroom_pipe.execute(encryption_script, external_pub_key, json.dumps(clean_info, ensure_ascii=False))
 data = zenroom_buffer.execute(encryption_script, external_pub_key, json.dumps(data_to_encrypt))
 
-print(data)
+# print(data)
 ###
+
+print("Done!")

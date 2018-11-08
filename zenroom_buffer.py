@@ -1,6 +1,6 @@
 import ctypes
 
-_zenroom = ctypes.CDLL('./zenroom/_zenroom_1.8.1.so')
+_zenroom = ctypes.CDLL('./zenroom/_zenroom.so')
 
 def execute(script, keys, data, verbosity=1, conf=None):
     stdout_buf = ctypes.create_string_buffer("x" * 10000)
