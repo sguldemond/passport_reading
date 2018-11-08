@@ -3,16 +3,16 @@ from cStringIO import StringIO
 from shutil import copyfileobj
 import os, base64
 
-def convert_image(img_data, output_name, output=True):
+def convert_image(img_data, output_name, output_format, output=True):
     with open('tmp.jp2', 'wb') as input:
         input.write(img_data)
     
     main_img = Image.open('tmp.jp2')
     os.remove('tmp.jp2')
     
-    main_img = main_img.resize(((main_img.size[0] / 3), (main_img.size[1] / 3)), Image.ANTIALIAS)
+    main_img = main_img.resize(((main_img.size[0] / 2), (main_img.size[1] / 2)), Image.ANTIALIAS)
 
-    output_format = 'jpeg'
+    # output_format = 'jpeg'
     buffer = StringIO()
     main_img.save(buffer, format=output_format)
     base64_image = base64.b64encode(buffer.getvalue())

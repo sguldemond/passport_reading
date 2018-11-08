@@ -1,6 +1,7 @@
 from pypassport.reader import ReaderManager
 from pypassport.epassport import EPassport, mrz
 from pypassport.doc9303 import tagconverter
+from pypassport.iso7816 import Iso7816Exception
 
 from image_handler import convert_image
 
@@ -8,9 +9,13 @@ import json
 
 class Passport:
     def __init__(self, mrz, output=False):
+        if(type(mrz) is list):
+            mrz = self._buildMRZ(mrz[0], mrz[1], mrz[2])
+
         self.mrz_string = mrz
         self.output = output
         self.reader_obj = None
+        self.dg1_retries = 0
     
     def _set_reader_obj(self):
         if self.reader_obj != None:
@@ -38,11 +43,22 @@ class Passport:
     def personal_data(self):
         self._set_epassport()
 
-        # if self._set_epassport() == False:
-        #     print "EPassport not set"
-        #     return
-        
-        dg1_data = self.epassport['DG1']
+        # TODO: catch Iso7816Exception and retry
+        try:
+            if self.dg1_retries == 3:
+                print "Reposition ID-card and try again"
+                return
+
+            if self.dg1_retries > 0:
+                print "Retry count: {}".format(self.dg1_retries)
+
+            dg1_data = self.epassport['DG1']
+        except Iso7816Exception as e:
+            print e.message
+            print "Retrying..."
+            self.dg1_retries += 1
+            return self.personal_data()
+
 
         clean_info = {}
         for attribute, value in dg1_data.iteritems():
@@ -58,7 +74,7 @@ class Passport:
 
         return clean_info
 
-    def image(self):
+    def photo_data(self, output_format='jpeg'):
         if self._set_epassport() == False:
             print "EPassport not set"
             return
@@ -79,4 +95,46 @@ class Passport:
         else:
             output_name = 'tmp'
 
-        return convert_image(img_data, output_name, self.output)
+        return convert_image(img_data, output_name, output_format, self.output)
+
+    # From pypassport > attacks > bruteForce
+    def _buildMRZ(self, id_pass, dob, exp, pers_num="<<<<<<<<<<<<<<"):
+        """
+        Create the MRZ based on:
+         - the document number
+         - the date of birth
+         - the expiration date
+         - (optional) personal number
+
+        @param id_pass: Document number
+        @type id_pass: String (0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ<)
+        @param dob: Date of birth
+        @type dob: String (YYMMDD)
+        @param exp: Expiration date
+        @type exp: String (YYMMDD)
+        @param pers_num: (optional) Personal number. If not set, value = "<<<<<<<<<<<<<<"
+        @type pers_num: String (0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ<)
+
+        @return: A String "PPPPPPPPPPCXXXBBBBBBCXEEEEEECNNNNNNNNNNNNNNCC"
+        """
+
+        id_pass_full = id_pass + (9-len(id_pass))*'<' + self._calculCheckDigit(id_pass)
+        dob_full = dob + self._calculCheckDigit(dob)
+        exp_full = exp + self._calculCheckDigit(exp)
+        pers_num_full = pers_num + self._calculCheckDigit(pers_num)
+        return id_pass_full + "???" + dob_full + "?" + exp_full + pers_num_full + self._calculCheckDigit(id_pass_full+dob_full+exp_full+pers_num_full)
+    
+    # From pypassport > doc9303 > mrz
+    def _calculCheckDigit(self, value):
+        weighting = [7,3,1]
+        weight = {'0':0, '1':1, '2':2, '3':3, '4':4, '5':5, '6':6, '7':7, '8':8, '9':9, '<':0,
+          'A':10, 'B':11, 'C':12, 'D':13, 'E':14, 'F':15, 'G':16, 'H':17, 'I':18, 'J':19, 'K':20, 'L':21, 'M':22,
+          'N':23, 'O':24, 'P':25, 'Q':26, 'R':27, 'S':28, 'T':29, 'U':30, 'V':31, 'W':32, 'X':33, 'Y':34, 'Z':35};
+        cpt=0
+        res=0
+        for x in value:
+            tmp = weight[str(x)] * weighting[cpt%3]
+            res += tmp
+            cpt += 1
+        return str(res%10)
+
