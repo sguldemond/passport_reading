@@ -7,7 +7,10 @@ from image_handler import convert_image
 
 import json
 
-class Passport:
+class MRTD:
+    """
+    Machine Readable Travel Document
+    """
     def __init__(self, mrz, output=False):
         if(type(mrz) is list):
             mrz = self._buildMRZ(mrz[0], mrz[1], mrz[2])
@@ -133,7 +136,7 @@ class Passport:
         res=0
         for x in value:
             tmp = weight[str(x)] * weighting[cpt%3]
-            res += tmp
+            res += tmp            
             cpt += 1
         return str(res%10)
 
