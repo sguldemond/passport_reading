@@ -1,4 +1,6 @@
 from PIL import Image
+import qrcode
+from qrcode.image.pure import PymagingImage
 from cStringIO import StringIO
 from shutil import copyfileobj
 import os, base64
@@ -27,3 +29,12 @@ def convert_image(img_data, output_name, output_format, output=True):
         
     buffer.close()
     return base64_image
+
+def qr_image(input):
+    qr_img = qrcode.make(input, image_factory=PymagingImage)
+
+    with open('qr.png', 'wb') as output:
+        qr_img.save(output)
+
+    qr = Image.open('qr.png')
+    qr.show()
