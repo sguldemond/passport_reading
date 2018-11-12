@@ -43,7 +43,6 @@ class Passport:
     def personal_data(self):
         self._set_epassport()
 
-        # TODO: catch Iso7816Exception and retry
         try:
             if self.dg1_retries == 3:
                 print "Reposition ID-card and try again"
