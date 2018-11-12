@@ -6,7 +6,10 @@ from image_handler import convert_image
 
 import json
 
-class Passport:
+class MRTD:
+    """
+    Machine Readable Travel Document
+    """
     def __init__(self, mrz, output=False):
         self.mrz_string = mrz
         self.output = output
@@ -23,6 +26,7 @@ class Passport:
     
     def _check_mrz(self):
         mrz_obj = mrz.MRZ(self.mrz_string)
+        print(self.mrz_string)
         return mrz_obj.checkMRZ()
     
     def _set_epassport(self):

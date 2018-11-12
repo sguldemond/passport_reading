@@ -1,5 +1,5 @@
 from Tkinter import *
-from passport import Passport
+from mrtd import MRTD
 import json
 
 class GUI:
@@ -8,7 +8,7 @@ class GUI:
         self.photo = None
         self.default_data = True
 
-        master.title("ID Reader")
+        master.title("MRTD Reader")
 
         column2width=30
 
@@ -53,7 +53,7 @@ class GUI:
 
         mrz = [docNumber, dateOfBirth, expiryDate]
         
-        id = Passport(mrz, False)
+        id = MRTD(mrz, False)
 
         personal_data = id.personal_data()
 
@@ -70,12 +70,6 @@ class GUI:
         Label(self.master, text=personal_data['Nationality']).grid(row=8, column=1, pady=5, padx=5, sticky=(W, N))
         Label(self.master, text=personal_data['Document Type']).grid(row=9, column=1, pady=5, padx=5, sticky=(W, N))
 
-
-
-
-
-
-    
 root = Tk()
 gui = GUI(root)
 root.mainloop()

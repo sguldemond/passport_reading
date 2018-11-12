@@ -1,4 +1,4 @@
-from passport import Passport
+from mrtd import MRTD
 # import zenroom_pipe
 import zenroom_buffer
 
@@ -8,7 +8,7 @@ with open('config.json') as input:
     json_input = json.load(input)
     mrz_string = json_input['mrz']
 
-id_card = Passport(mrz_string, True)
+id_card = MRTD(mrz_string, True)
 personal_data = id_card.personal_data()
 image_base64 = id_card.image()
 # print(image_base64)
