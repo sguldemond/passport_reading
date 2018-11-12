@@ -24,15 +24,12 @@ data_to_encrypt = []
 data_to_encrypt.append({'personal_data': personal_data})
 # data_to_encrypt.append({'image_base64': image_base64})
 
-
-
 with open('zenroom/test_data.json', 'w') as output:
     json.dump(data_to_encrypt, output)
 
 # data = zenroom_pipe.execute(encryption_script, external_pub_key, json.dumps(clean_info, ensure_ascii=False))
 data = zenroom_buffer.execute(encryption_script, external_pub_key, json.dumps(data_to_encrypt))
-
-# print(data)
+print(data)
 ###
 
 print("Done!")
