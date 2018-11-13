@@ -6,7 +6,6 @@ import os, json, time
 
 ### start Init Session ###
 session = OnboardingSession()
-print(session.session_id)
 wait_for_client = True
 while wait_for_client:
     status = session.get_status()

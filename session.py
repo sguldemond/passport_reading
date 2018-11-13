@@ -12,6 +12,7 @@ class OnboardingSession:
     def __init__(self):
         response = requests.post("{0}/{1}".format(api_url, 'init_onboarding'))
         self.session_id = response.json()['session_id']
+        print("Started session with session ID: {0}".format(self.session_id))
         image_handler.qr_image(self.session_id)
 
     def get_status(self):
