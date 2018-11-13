@@ -5,7 +5,7 @@ from cStringIO import StringIO
 from shutil import copyfileobj
 import os, base64
 
-def convert_image(img_data, output_name, output_format, output=True):
+def convert_jp2(img_data, output_name, output_format, output=True):
     with open('tmp.jp2', 'wb') as input:
         input.write(img_data)
     

@@ -3,7 +3,7 @@ from pypassport.epassport import EPassport, mrz
 from pypassport.doc9303 import tagconverter
 from pypassport.iso7816 import Iso7816Exception
 
-from image_handler import convert_image
+from image_handler import convert_jp2
 
 import json
 
@@ -12,7 +12,7 @@ class MRTD:
     Machine Readable Travel Document
 
     TODO:
-    - Extent doc
+    - Extend doc
     - More error/exception handeling
     """
     def __init__(self, mrz, output=False):
@@ -101,7 +101,7 @@ class MRTD:
         else:
             output_name = 'tmp'
 
-        return convert_image(img_data, output_name, output_format, self.output)
+        return convert_jp2(img_data, output_name, output_format, self.output)
 
     # From pypassport > attacks > bruteForce
     def _buildMRZ(self, id_pass, dob, exp, pers_num="<<<<<<<<<<<<<<"):

@@ -17,13 +17,13 @@ class OnboardingSession:
         :param string api_url: URL of Session Manager to connect with
         """
         self.api_url = api_url
-        error_message_init = "Could not connect to API [{0}], please check connection".format(self.api_url)
-        error_message_lost = "Connection with API lost [{0}], please check connection".format(self.api_url)
+        error_message_init = "Could not connect to API [{}], please check connection".format(self.api_url)
+        error_message_lost = "Connection with API lost [{}], please check connection".format(self.api_url)
 
         try:
             response = requests.post("{0}/{1}".format(self.api_url, 'init_onboarding'))
             self.session_id = response.json()['session_id']
-            print "Started session [{0}]".format(self.session_id)
+            print "Started session [{}]".format(self.session_id)
         except ConnectionError as e:
             logging.error(e)
             print self.error_message_init
@@ -62,7 +62,7 @@ class OnboardingSession:
         data = {"encrypted_data": data, "session_id": self.session_id}
         try:
             response = requests.post("{0}/{1}".format(self.api_url, 'attach_encrypted_data'), json=data)
-            print "Added data to session [{0}]".format(self.session_id)
+            print "Added data to session [{}]".format(self.session_id)
             return response.json()['response']
         except ConnectionError as e:
             logging.error(e)

@@ -15,8 +15,8 @@ def execute(script, keys, data, verbosity=1, conf=None):
 
     Zenroom embed documentation: https://github.com/DECODEproject/zenroom/wiki/Embed
     """
-    stdout_buf = ctypes.create_string_buffer("x" * 10000)
-    stdout_len = ctypes.c_size_t(10000)
+    stdout_buf = ctypes.create_string_buffer("x" * 20000)
+    stdout_len = ctypes.c_size_t(20000)
     stderr_buf = ctypes.create_string_buffer("x" * 1024)
     stderr_len = ctypes.c_size_t(1024)
 
