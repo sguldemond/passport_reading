@@ -12,8 +12,8 @@ class MRTD:
     Machine Readable Travel Document
 
     TODO:
+    - Catch and display TimeOut nicely
     - Extend doc
-    - More error/exception handeling
     """
     def __init__(self, mrz, output=False):
         if(type(mrz) is list):

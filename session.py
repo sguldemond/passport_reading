@@ -1,10 +1,26 @@
-import image_handler
-
 from requests.exceptions import ConnectionError
 import requests, json, logging, sys
 
+import image_handler
+from socket_io import SocketThread
 
-class OnboardingSession:
+class SocketCom():
+    def __init__(self, parent, api_url):
+        self.parent = parent
+        self.socket_thread = SocketThread(self, api_url)
+        self.socket_thread.daemon = True
+        self.socket_thread.start()
+        self.session_id = None
+        self.session_status = None
+
+    def join_room(self, room):
+        self.socket_thread.join_room(room)
+
+    def on_status_update(self, data):
+        print(data, type(data))
+        self.session_status = data[0]['status']
+
+class OnboardingSession():
     """
     This class handles all the communcation with the session manager.
 
