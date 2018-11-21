@@ -9,7 +9,7 @@ class OnboardingSession:
     This class handles all the communcation with the session manager.
 
     session_id: Session ID of session retrieved from Session Manager
-    """    
+    """
     def __init__(self, api_url):
         """
         Initiate the class as an object and initiate a session at the session manager
