@@ -12,11 +12,10 @@ class SocketThread(Thread):
         self.socketIO.on('status_update', self.on_status_update)
 
     def on_status_update(self, *args):
-        print('on_status_update', args)
         self.parent.on_status_update(args)
 
     def on_join_room_response(*args):
-        print('on_join_room_response', args)
+        print('on_join_room_response')
 
     def join_room(self, room):
         self.socketIO.emit('join_room', {'room': room}, self.on_join_room_response)
