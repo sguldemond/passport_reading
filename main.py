@@ -10,7 +10,6 @@ import os, json, time
 class Main():
     def __init__(self, api_url):
         self.api_url = api_url
-        print(self.api_url)
 
     def start(self):
         """
@@ -93,8 +92,9 @@ class Main():
         """
         7) Add encrypted data to session
         """
-        session = self.session.attach_encrypted_data(data)
-        print(session['status'])
+        self.session.attach_encrypted_data(data)
+        
+        print("Done, closing!")
 
 
 main = Main("http://127.0.0.1:5000")

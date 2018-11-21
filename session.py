@@ -5,6 +5,10 @@ import image_handler
 from socket_io import SocketThread
 
 class SocketCom():
+    """
+    TODO:
+    - add doc
+    """
     def __init__(self, api_url):
         self.socket_thread = SocketThread(self, api_url)
         self.socket_thread.daemon = True
@@ -17,7 +21,6 @@ class SocketCom():
         self.socket_thread.join_room(room)
 
     def on_status_update(self, data):
-        print(data, type(data))
         self.session_status = data[0]['status']
 
 class OnboardingSession():

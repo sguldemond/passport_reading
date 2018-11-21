@@ -1,4 +1,4 @@
-from pypassport.reader import ReaderManager
+from pypassport.reader import ReaderManager, TimeOutException
 from pypassport.epassport import EPassport, mrz
 from pypassport.doc9303 import tagconverter
 from pypassport.iso7816 import Iso7816Exception
@@ -30,7 +30,12 @@ class MRTD:
         
         rm = ReaderManager()
         print "Waiting for card..."
-        self.reader_obj = rm.waitForCard()
+        try:
+            self.reader_obj = rm.waitForCard()
+        except TimeOutException as e:
+            print "Retrying after '{}'".format(e.message)
+            return self._set_reader_obj()
+
         print "Card detected!"
     
     def _check_mrz(self):
