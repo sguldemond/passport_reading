@@ -1,23 +1,27 @@
 # Classes
-from session import OnboardingSession, SocketCom
+from session import OnboardingSession
+from socketio import SocketCom
 from mrtd import MRTD
 # Helpers
 import zenroom_buffer
 import image_handler
+# Config
+import config
 # Core
 import os, json, time
+from threading import Event
 
-class Main():
-    def __init__(self, api_url):
-        self.api_url = api_url
-
+class Main:
     def start(self):
         """
         1) Setup session & import Zencode script
         """
-        self.session = OnboardingSession(self.api_url)
-        # self.socket_com = SocketCom(api_url)
-        # self.socket_com.join_room(self.session.session_id)
+        api_url = config.SERVER_CONFIG['api_url']
+        self.session = OnboardingSession(api_url)
+
+        self.ready = Event()
+        self.socket_com = SocketCom(self.ready, api_url)
+        self.socket_com.join_room(self.session.session_id)
 
         with open('zenroom/encrypt_message.lua', 'r') as input:
             self.encryption_script = input.read()
@@ -29,11 +33,7 @@ class Main():
         """
         2) Get MRZ from ID document, should become OCR
         """
-        with open('config.json') as input:
-            json_input = json.load(input)
-            mrz_string = json_input['mrz']
-        
-        self._setup_mrtd(mrz_string)
+        self._setup_mrtd(config.MRZ_CONFIG['mrz'])
 
     def _setup_mrtd(self, mrz_string):
         """
@@ -49,11 +49,7 @@ class Main():
         """
         image_handler.qr_image(self.session.session_id)
 
-        waiting = True
-        while waiting:
-            if self.session.socket_com.session_status == 'CONTINUED_1':
-                waiting = False
-        
+        self.ready.wait()
         self._get_pkey()
 
     def _get_pkey(self):
@@ -97,5 +93,5 @@ class Main():
         print("Done, closing!")
 
 
-main = Main("http://127.0.0.1:5000")
+main = Main()
 main.start()

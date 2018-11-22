@@ -1,51 +1,45 @@
 from requests.exceptions import ConnectionError
 import requests, json, logging, sys
+from enum import Enum
 
 import image_handler
-from socket_io import SocketThread
 
-class SocketCom():
-    """
-    TODO:
-    - add doc
-    """
-    def __init__(self, api_url):
-        self.socket_thread = SocketThread(self, api_url)
-        self.socket_thread.daemon = True
-        self.socket_thread.start()
-        
-        self.session_id = None
-        self.session_status = None
+class SessionStatus(Enum):
+    INITIALIZED = 'INITIALIZED'
+    GOT_PUB_KEY = 'GOT_PUB_KEY'
+    GOT_ENCR_DATA = 'GOT_ENCR_DATA'
+    FINALIZED = 'FINALIZED'
 
-    def join_room(self, room):
-        self.socket_thread.join_room(room)
-
-    def on_status_update(self, data):
-        self.session_status = data[0]['status']
-
-class OnboardingSession():
+class OnboardingSession:
     """
     This class handles all the communcation with the session manager.
 
     session_id: Session ID of session retrieved from Session Manager
+
+    TODO:
+    - handle http non 200 responses
     """
     def __init__(self, api_url):
         """
-        Initiate the class as an object and initiate a session at the session manager
+        - Initiate the class as an object
+        - Initiate a session at the session manager
+        - Setup socket communication with session manager
 
         :param string api_url: URL of Session Manager to connect with
         """
         self.api_url = api_url
-        error_message_init = "Could not connect to API [{}], please check connection".format(self.api_url)
-        error_message_lost = "Connection with API lost [{}], please check connection".format(self.api_url)
+        self.error_message_init = "Could not connect to API [{}], please check connection".format(self.api_url)
+        self.error_message_lost = "Connection with API lost [{}], please check connection".format(self.api_url)
 
         try:
             response = requests.post("{0}/{1}".format(self.api_url, 'init_onboarding'))
+            if response.status_code != 200:
+                #TODO: improve
+                print(response)
+                sys.exit(1)
+            print(response)
             self.session_id = response.json()['session_id']
             print "Started session [{}]".format(self.session_id)
-
-            self.socket_com = SocketCom(self.api_url)
-            self.socket_com.join_room(self.session_id)
         except ConnectionError as e:
             logging.error(e)
             print self.error_message_init

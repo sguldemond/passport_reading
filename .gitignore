@@ -1,11 +1,12 @@
 # folders
+.idea/
 .vscode/
 output/
 python2/
 
 # files
 mrz.json
-config.json
+config.py
 
 # file types
 *.pyc
