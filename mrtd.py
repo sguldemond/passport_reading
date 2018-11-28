@@ -5,7 +5,7 @@ from pypassport.iso7816 import Iso7816Exception
 
 from image_handler import convert_jp2
 
-import json
+import json, logging
 
 class MRTD:
     """
@@ -28,14 +28,14 @@ class MRTD:
             return
         
         rm = ReaderManager()
-        print "Waiting for card..."
+        logging.info("Waiting for card...")
         try:
             self.reader_obj = rm.waitForCard()
         except TimeOutException as e:
-            print "Retrying after '{}'".format(e.message)
+            logging.warn("Retrying after '{}'".format(e.message))
             return self._set_reader_obj()
 
-        print "Card detected!"
+        logging.info("Card detected!")
     
     def _check_mrz(self):
         mrz_obj = mrz.MRZ(self.mrz_string)
@@ -43,7 +43,7 @@ class MRTD:
     
     def _set_epassport(self):
         if self._check_mrz() == False:
-            print "MRZ is not valid"
+            logging.warn("MRZ is not valid")
             return False
         
         self._set_reader_obj()
@@ -56,16 +56,16 @@ class MRTD:
 
         try:
             if self.dg1_retries == 3:
-                print "Reposition ID-card and try again"
+                logging.info("Reposition ID-card and try again")
                 return
 
             if self.dg1_retries > 0:
-                print "Retry count: {}".format(self.dg1_retries)
+                logging.info("Retry count: {}".format(self.dg1_retries))
 
             dg1_data = self.epassport['DG1']
         except Iso7816Exception as e:
-            print e.message
-            print "Retrying..."
+            logging.exception(e.message)
+            logging.info("Retrying...")
             self.dg1_retries += 1
             return self.personal_data()
 
@@ -86,10 +86,10 @@ class MRTD:
 
     def photo_data(self, output_format='jpeg'):
         if self._set_epassport() == False:
-            print "EPassport not set"
+            logging.error("EPassport not set")
             return
 
-        print "Getting image from NFC, this might take a while..."
+        logging.info("Getting image from NFC, this might take a while...")
         dg2_data = self.epassport['DG2']
 
         # check from ePassportviewer

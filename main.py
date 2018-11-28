@@ -8,7 +8,7 @@ import image_handler
 # Config
 import config
 # Core
-import os, json, time
+import os, json, time, logging
 from threading import Event
 
 class Main:
@@ -17,7 +17,7 @@ class Main:
         1) Setup session & import Zencode script
         """
         api_url = config.SERVER_CONFIG['api_url']
-        print("Connecting with: {}".format(api_url))
+        logging.info("Connecting with: {}".format(api_url))
         self.session = OnboardingSession(api_url)
 
         self.ready = Event()
@@ -48,6 +48,7 @@ class Main:
         """
         4) Show QR code with session ID
         """
+        logging.info("Displaying QR code & waiting session status update")
         image_handler.qr_image(self.session.session_id)
 
         self.ready.wait()
@@ -91,8 +92,10 @@ class Main:
         """
         self.session.attach_encrypted_data(data)
         
-        print("Done, closing!")
+        logging.info("Done, closing!")
 
+
+logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 
 main = Main()
 main.start()

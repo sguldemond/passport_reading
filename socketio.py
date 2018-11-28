@@ -2,7 +2,7 @@ from socketIO_client import SocketIO
 from session import SessionStatus
 
 from threading import Thread
-import time
+import time, logging
 
 class SocketCom:
     """
@@ -22,7 +22,7 @@ class SocketCom:
 
     def on_status_update(self, data):
         self.session_status = data['status']
-        print("Session status update [{}]".format(self.session_status))
+        logging.info("Session status update [{}]".format(self.session_status))
         
         if self.session_status == SessionStatus.GOT_PUB_KEY.value:
             self.ready.set()

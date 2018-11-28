@@ -37,12 +37,11 @@ class OnboardingSession:
                 #TODO: improve
                 print(response)
                 sys.exit(1)
-            print(response)
             self.session_id = response.json()['session_id']
-            print "Started session [{}]".format(self.session_id)
+            logging.info("Started session [{}]".format(self.session_id))
         except ConnectionError as e:
             logging.error(e)
-            print self.error_message_init
+            logging.info(self.error_message_init)
             sys.exit(1)
 
     def get_data(self):
@@ -55,7 +54,7 @@ class OnboardingSession:
             return response.json()['response']
         except ConnectionError as e:
             logging.error(e)
-            print self.error_message_lost
+            logging.info(self.error_message_lost)
 
     def attach_encrypted_data(self, data):
         """
@@ -66,11 +65,11 @@ class OnboardingSession:
         data = {"encrypted_data": data, "session_id": self.session_id}
         try:
             response = requests.post("{0}/{1}".format(self.api_url, 'attach_encrypted_data'), json=data)
-            print "Added data to session [{}]".format(self.session_id)
+            logging.info("Added data to session [{}]".format(self.session_id))
             return response.json()['response']
         except ConnectionError as e:
             logging.error(e)
-            print self.error_message_lost
+            logging.info(self.error_message_lost)
 
     # Deprecated
     def get_status(self):
@@ -83,4 +82,4 @@ class OnboardingSession:
             return response.json()['response']
         except ConnectionError as e:
             logging.error(e)
-            print self.error_message_lost
+            logging.info(self.error_message_lost)
