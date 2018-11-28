@@ -40,7 +40,7 @@ class SocketThread(Thread):
         self.socketIO.on('status_update', self.parent.on_status_update)
 
     def join_room(self, room):
-        self.socketIO.emit('join_room', {'room': room})
+        self.socketIO.emit('join_room', {'session_id': room})
 
     def run(self):
         self.socketIO.wait()
