@@ -17,6 +17,7 @@ class Main:
         1) Setup session & import Zencode script
         """
         api_url = config.SERVER_CONFIG['api_url']
+        print("Connecting with: {}".format(api_url))
         self.session = OnboardingSession(api_url)
 
         self.ready = Event()

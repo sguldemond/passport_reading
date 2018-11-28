@@ -24,7 +24,7 @@ class SocketCom:
         self.session_status = data['status']
         print("Session status update [{}]".format(self.session_status))
         
-        if self.session_status == SessionStatus.GOT_PUB_KEY:
+        if self.session_status == SessionStatus.GOT_PUB_KEY.value:
             self.ready.set()
 
 
@@ -36,9 +36,7 @@ class SocketThread(Thread):
     def __init__(self, parent, api_url):
         Thread.__init__(self)
         self.parent = parent
-        print("hi1")
         self.socketIO = SocketIO(api_url)
-        print("hi2")
         self.socketIO.on('status_update', self.parent.on_status_update)
 
     def join_room(self, room):
