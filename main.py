@@ -28,7 +28,7 @@ class Main:
             self.encryption_script = input.read()
         
         self._get_mrz()
-        self._show_qr()
+        # self._show_qr()
 
     def _get_mrz(self):
         """
@@ -43,6 +43,8 @@ class Main:
         id_card = MRTD(mrz_string, True)
         
         self.personal_data = id_card.personal_data()
+
+        self._save_data(self.personal_data)
 
         if self.personal_data == None:
             sys.exit(1)
@@ -83,7 +85,7 @@ class Main:
         data_to_encrypt.append({'image_base64': self.image_base64})
 
         # for test purposes
-        # self._save_data(data_to_encrypt)
+        self._save_data(data_to_encrypt)
 
         data = zenroom_buffer.execute(self.encryption_script, json.dumps(public_key), json.dumps(data_to_encrypt))
         

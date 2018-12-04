@@ -7,6 +7,7 @@ from pypassport.iso7816 import Iso7816Exception
 from image_handler import convert_jp2
 
 import json, logging
+from datetime import datetime
 
 class MRTD:
     """
@@ -78,7 +79,7 @@ class MRTD:
         except BACException as e:
             logging.exception(e.message)
             logging.info("Possible mismatch MRZ and document")
-            return
+            return None
 
 
         clean_info = {}
@@ -119,7 +120,7 @@ class MRTD:
         except BACException as e:
             logging.exception(e.message)
             logging.info("Possible mismatch MRZ and document")
-            return
+            return None
 
 
         # check from ePassportviewer
@@ -136,6 +137,79 @@ class MRTD:
             output_name = 'tmp'
 
         return convert_jp2(img_data, output_name, output_format, self.output)
+
+    def format_name(self, input):
+        """
+        Formats a name as taken from DG1 to a readable format
+        Returns a list with the surname as first element and first name as second element
+
+        :param input: e.g. "VAN<DER<MEULEN<<MARTIN<<<<<<<<<<<<<<<<<"
+        """
+        index_end_surname = input.index("<<")
+        surname = input[:index_end_surname]
+    
+        if surname.find("<") == -1:
+            surname = surname.lower().capitalize()
+        else:
+            surname_list = surname.split("<")
+
+            surname = ""
+            i = 0
+            for name in surname_list:
+                surname += name.lower().capitalize()
+                if i != len(surname_list)-1:
+                    surname += " "
+                i += 1
+
+        first_name = input[index_end_surname:]
+        first_name = first_name[2:]
+
+        index_end = first_name.index("<<")
+        first_name = first_name[:index_end]
+
+        if first_name.find("<") == -1:
+            first_name = first_name.lower().capitalize()
+        else:
+            first_name_list = first_name.split("<")
+
+            first_name = ""
+            i = 0
+            for name in first_name_list:
+                first_name += name.lower().capitalize()                
+                if i != len(first_name_list)-1:
+                    first_name += " "
+                i += 1
+
+        full_name = []
+        full_name.append(surname)
+        full_name.append(first_name)
+        return full_name
+
+    def format_date(self, input, adjustment_years=10):
+        """
+        Formats a date as taken from DG1 (yymmdd) to a standard format (yyyy-mm-dd).
+
+        In this function the standard date formatting of Python is adjusted to fit the use case.
+        With Pythons default datetime will format '69' to '1969' and '68' to '2068'.
+        So all the years after '69 will be concidered 20th century and before '69 as 21st century.
+
+        This is changed to where the switch in century interpretation is x years before the current year.
+        This means as for today, 4th December 2018, i.e. '08' is '2008' and '09' is '1909'
+
+        :param input: year in format 'yymmdd'
+        :param adjustment_years: amount of years before current year what will be the new turn of century
+
+        """
+        date_obj = datetime.strptime(input, '%y%m%d')
+
+        current_year = datetime.now().year
+
+        if date_obj.year > current_year - adjustment_years:
+            date_obj = date_obj.replace(year=date_obj.year-100)
+
+        date = date_obj.strftime("%Y-%m-%d")
+
+        return date
 
     # From pypassport > attacks > bruteForce
     def _buildMRZ(self, id_pass, dob, exp, pers_num="<<<<<<<<<<<<<<"):
