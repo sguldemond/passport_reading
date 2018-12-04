@@ -1,6 +1,7 @@
 from pypassport.reader import ReaderManager, TimeOutException
 from pypassport.epassport import EPassport, mrz
 from pypassport.doc9303 import tagconverter
+from pypassport.doc9303.bac import BACException
 from pypassport.iso7816 import Iso7816Exception
 
 from image_handler import convert_jp2
@@ -20,9 +21,15 @@ class MRTD:
 
         self.mrz_string = mrz
         self.output = output
+        self.epassport = None
         self.reader_obj = None
         self.dg1_retries = 0
+        self.dg2_retries = 0
+        self.max_retries = 3
     
+    def do_bac(self):
+        self.epassport.doBasicAccessControl()
+
     def _set_reader_obj(self):
         if self.reader_obj != None:
             return
@@ -55,7 +62,7 @@ class MRTD:
         self._set_epassport()
 
         try:
-            if self.dg1_retries == 3:
+            if self.dg1_retries == self.max_retries:
                 logging.info("Reposition ID-card and try again")
                 return
 
@@ -68,6 +75,10 @@ class MRTD:
             logging.info("Retrying...")
             self.dg1_retries += 1
             return self.personal_data()
+        except BACException as e:
+            logging.exception(e.message)
+            logging.info("Possible mismatch MRZ and document")
+            return
 
 
         clean_info = {}
@@ -90,7 +101,26 @@ class MRTD:
             return
 
         logging.info("Getting image from NFC, this might take a while...")
-        dg2_data = self.epassport['DG2']
+
+        try:
+            if self.dg2_retries == self.max_retries:
+                logging.info("Reposition ID-card and try again")
+                return
+
+            if self.dg2_retries > 0:
+                logging.info("Retry count: {}".format(self.dg2_retries))
+
+            dg2_data = self.epassport['DG2']
+        except Iso7816Exception as e:
+            logging.exception(e.message)
+            logging.info("Retrying...")
+            self.dg2_retries += 1
+            return self.photo_data()
+        except BACException as e:
+            logging.exception(e.message)
+            logging.info("Possible mismatch MRZ and document")
+            return
+
 
         # check from ePassportviewer
         if dg2_data['A1'].has_key('5F2E'): tag = '5F2E' # 5F2E: Biometric data block 

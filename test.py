@@ -1,11 +1,5 @@
-from session import SocketSession
-import time
+from mrtd import MRTD
+import config
 
-socket_session = SocketSession('localhost:5000')
-socket_session.init_onboarding()
-
-
-
-# keeping main thread alive in order to run SocketThread in daemon mode, so exiting is normal
-while True:
-    time.sleep(1)
+passport = MRTD(config.MRZ_CONFIG['mrz2'])
+print(passport.do_bac())

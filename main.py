@@ -8,15 +8,15 @@ import image_handler
 # Config
 import config
 # Core
-import os, json, time, logging
+import os, json, time, logging, sys, getopt
 from threading import Event
 
 class Main:
-    def start(self):
+    def start(self, api_url):
         """
         1) Setup session & import Zencode script
         """
-        api_url = config.SERVER_CONFIG['api_url']
+        # api_url = config.SERVER_CONFIG['api_url']
         logging.info("Connecting with: {}".format(api_url))
         self.session = OnboardingSession(api_url)
 
@@ -34,15 +34,25 @@ class Main:
         """
         2) Get MRZ from ID document, should become OCR
         """
-        self._setup_mrtd(config.MRZ_CONFIG['mrz'])
+        self._setup_mrtd(config.MRZ_CONFIG['mrz1'])
 
     def _setup_mrtd(self, mrz_string):
         """
         3) Setup MRTD and get data
         """
-        id_card = MRTD(mrz_string)
+        id_card = MRTD(mrz_string, True)
+        
         self.personal_data = id_card.personal_data()
+
+        if self.personal_data == None:
+            sys.exit(1)
+
         self.image_base64 = id_card.photo_data()
+
+        if self.image_base64 == None:
+            sys.exit(1)
+
+        # print(self.personal_data)
 
     def _show_qr(self):
         """
@@ -73,7 +83,7 @@ class Main:
         data_to_encrypt.append({'image_base64': self.image_base64})
 
         # for test purposes
-        self._save_data(data_to_encrypt)
+        # self._save_data(data_to_encrypt)
 
         data = zenroom_buffer.execute(self.encryption_script, json.dumps(public_key), json.dumps(data_to_encrypt))
         
@@ -97,5 +107,18 @@ class Main:
 
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 
+# print(str(sys.argv))
+
+api_url = "http://oscity.nl:5005"
+
+arg = str(sys.argv)[13:][:5]
+# print(arg)
+if arg == "--dev":
+    api_url = "http://127.0.0.1:5000"
+
+# print(api_url)
+
 main = Main()
-main.start()
+main.start(api_url)
+
+# main._get_mrz()
