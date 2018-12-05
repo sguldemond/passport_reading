@@ -16,8 +16,9 @@ class MRTD:
     TODO:
     - add doc
     """
-    def __init__(self, mrz, output=False):
+    def __init__(self, mrz=None, output=False):
         if(type(mrz) is list):
+            #                    doc_nr, dob,    exp_nr
             mrz = self._buildMRZ(mrz[0], mrz[1], mrz[2])
 
         self.mrz_string = mrz
@@ -45,12 +46,12 @@ class MRTD:
 
         logging.info("Card detected!")
     
-    def _check_mrz(self):
-        mrz_obj = mrz.MRZ(self.mrz_string)
+    def check_mrz(self, mrz_string):
+        mrz_obj = mrz.MRZ(mrz_string)
         return mrz_obj.checkMRZ()
     
     def _set_epassport(self):
-        if self._check_mrz() == False:
+        if self.check_mrz(self.mrz_string) == False:
             logging.warn("MRZ is not valid")
             return False
         
@@ -141,7 +142,8 @@ class MRTD:
     def format_name(self, input):
         """
         Formats a name as taken from DG1 to a readable format
-        Returns a list with the surname as first element and first name as second element
+        Returns a list with the surname as first element and first name as second element,
+        e.g. ["Van Der Meulen", "Martin"]
 
         :param input: e.g. "VAN<DER<MEULEN<<MARTIN<<<<<<<<<<<<<<<<<"
         """

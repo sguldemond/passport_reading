@@ -64,7 +64,7 @@ class TestPassportClass(unittest.TestCase):
     def test_date_format_3(self):
         input = "080101"
         """
-        Testing border case
+        Testing edge case
         """
         expected_output = "2008-01-01"
 
@@ -75,7 +75,7 @@ class TestPassportClass(unittest.TestCase):
 
     def test_date_format_4(self):
         """
-        Testing border case
+        Testing edge case
         """
         input = "090101"
         expected_output = "1909-01-01"
@@ -87,7 +87,7 @@ class TestPassportClass(unittest.TestCase):
 
     def test_date_format_5(self):
         """
-        Testing border cases
+        Testing edge cases
         """
         input_a = "060101"
         expected_output_a = "2006-01-01"

@@ -5,6 +5,7 @@ from mrtd import MRTD
 # Helpers
 import zenroom_buffer
 import image_handler
+import ocr
 # Config
 import config
 # Core
@@ -28,23 +29,26 @@ class Main:
             self.encryption_script = input.read()
         
         self._get_mrz()
-        # self._show_qr()
+        self._show_qr()
 
     def _get_mrz(self):
         """
         2) Get MRZ from ID document, should become OCR
         """
-        self._setup_mrtd(config.MRZ_CONFIG['mrz1'])
+        # self._setup_mrtd(config.MRZ_CONFIG['mrz1'])
 
-    def _setup_mrtd(self, mrz_string):
+        logging.info("Reading MRZ with OCR...")
+        mrz = ocr.get_mrz()
+        logging.info("MRZ read [{}]".format(mrz))
+        self._setup_mrtd(mrz)
+
+    def _setup_mrtd(self, mrz):
         """
         3) Setup MRTD and get data
         """
-        id_card = MRTD(mrz_string, True)
+        id_card = MRTD(mrz, True)
         
         self.personal_data = id_card.personal_data()
-
-        self._save_data(self.personal_data)
 
         if self.personal_data == None:
             sys.exit(1)
@@ -95,7 +99,7 @@ class Main:
         """
         6.2) Save encrypted data for testing purposes
         """
-        with open('zenroom/test_data.json', 'w') as output:
+        with open('output/test_data.json', 'w') as output:
             json.dump(data, output)
 
     def _attach_data(self, data):
@@ -111,12 +115,12 @@ logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 
 # print(str(sys.argv))
 
-api_url = "http://oscity.nl:5005"
+api_url = config.SERVER_CONFIG['prod']
 
 arg = str(sys.argv)[13:][:5]
 # print(arg)
 if arg == "--dev":
-    api_url = "http://127.0.0.1:5000"
+    api_url = config.SERVER_CONFIG['dev']
 
 # print(api_url)
 
