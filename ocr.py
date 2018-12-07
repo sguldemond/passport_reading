@@ -9,7 +9,7 @@ TODO:
 - document mambojumbo
 """
 def get_mrz():
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
     tmp_file = 'tmp_capture.png'
     mrz_list = None
     sleep_time = .100
@@ -23,7 +23,7 @@ def get_mrz():
         except ValueError as e:
             logging.warning(e.message)
             continue
-        # print("Trying...")
+        print("Trying...")
         if mrz != None:
             mrz_list = [mrz.number, mrz.date_of_birth, mrz.expiration_date]
             print(mrz_list)

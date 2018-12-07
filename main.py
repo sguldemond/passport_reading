@@ -1,5 +1,5 @@
 # Classes
-from session import OnboardingSession
+from session import OnboardingSession, SessionStatus
 from socketio import SocketCom
 from mrtd import MRTD
 # Helpers
@@ -113,18 +113,12 @@ class Main:
 
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 
-# print(str(sys.argv))
-
 api_url = config.SERVER_CONFIG['prod']
 
 arg = str(sys.argv)[13:][:5]
-# print(arg)
 if arg == "--dev":
     api_url = config.SERVER_CONFIG['dev']
 
-# print(api_url)
 
 main = Main()
 main.start(api_url)
-
-# main._get_mrz()
