@@ -5,7 +5,7 @@ from mrtd import MRTD
 # Helpers
 import zenroom_buffer
 import image_handler
-import ocr
+from ocr import OCR
 # Config
 import config
 # Core
@@ -20,13 +20,14 @@ class Main:
         self.socket_com = None
         self.encryption_script = None
         
+        self.ocr = OCR()
+
         self.mrz = None
         self.mrtd_data = None
         self.public_key = None
         self.encrypted_data = None
 
-        self.started_mrz = False
-        self.started_mrtd = False
+        self.i = 0
 
     def start(self):
         """
@@ -51,30 +52,16 @@ class Main:
         """
         self.mrz = config.MRZ_CONFIG['mrz1']
 
-        # logging.info("Reading MRZ with OCR...")
-        # self.mrz = ocr.get_mrz()
-        # logging.info("MRZ read [{}]".format(self.mrz))
-
-    def loop_mrz(self):
-        if self.started_mrz == False:
-            # mrz_thread = Thread(target=self.get_mrz())
-            # mrz_thread.setDaemon(True)
-            # mrz_thread.start()
-
-            self.get_mrz()
-
-            self.started_mrz = True
-
-        if self.mrz:
-            return True
+        # self.mrz = self.ocr.get_mrz()
+        # if self.mrz:
+        #     return True
         
-        return None
-
     def setup_mrtd(self):
         """
         3) Setup MRTD and get data
         """
-        id_card = MRTD(self.mrz, True)
+        output_file = False
+        id_card = MRTD(self.mrz, output_file)
         
         personal_data = id_card.personal_data()
 
@@ -90,21 +77,11 @@ class Main:
 
         self.mrtd_data = [ {'personal_data': personal_data}, {'image_base64': image_base64} ]
 
-    def loop_mrtd(self):
-        if self.started_mrtd == False:
-            # mrtd_thread = Thread(target=self.setup_mrtd())
-            # mrtd_thread.setDaemon(True)
-            # mrtd_thread.start()
+    def test_loop(self):
+        self.i += 1
 
-            self.setup_mrtd()
-            
-            self.started_mrtd = True
-        
-        if self.mrtd_data:
+        if self.i is 5:
             return True
-
-        return None
-
 
     def show_qr(self):
         """

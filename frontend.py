@@ -57,7 +57,7 @@ SCREENS = [
             'name' : 'reading',
             'image' : 'assets/reading.png',
             'action' : {
-                    'loop_func' : backend.loop_mrz,
+                    'loop_func' : backend.get_mrz,
                     'on_data_command' : 'NEXT_SCREEN',
                     'on_data_param' : 'qr-code'
                 }
@@ -66,7 +66,7 @@ SCREENS = [
             'name' : 'qr-code',
             'image' : 'assets/scan.png',
             'action' : {
-                    'loop_func' : backend.loop_mrtd,
+                    'loop_func' : backend.test_loop,
                     'on_data_command' : 'NEXT_SCREEN',
                     'on_data_param' : 'start'
                 }
