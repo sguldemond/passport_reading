@@ -24,7 +24,7 @@ class SocketCom:
         self.session_status = data['status']
         logging.info("Session status update [{}]".format(self.session_status))
         
-        if self.session_status == SessionStatus.GOT_PUB_KEY:
+        if self.session_status == SessionStatus.GOT_PUB_KEY.value:
             self.ready.set()
 
 

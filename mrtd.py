@@ -1,12 +1,13 @@
 from pypassport.reader import ReaderManager, TimeOutException
 from pypassport.epassport import EPassport, mrz
-from pypassport.doc9303 import tagconverter
+# from pypassport.doc9303 import tagconverter
+import tagconverter
 from pypassport.doc9303.bac import BACException
 from pypassport.iso7816 import Iso7816Exception
 
 from image_handler import convert_jp2
 
-import json, logging
+import json, logging, re
 from datetime import datetime
 
 class MRTD:
@@ -86,8 +87,18 @@ class MRTD:
         clean_info = {}
         for attribute, value in dg1_data.iteritems():
             tag_name = tagconverter.tagToName[attribute]
+            
+            if tag_name is 'name':
+                value = self.format_name(value)
+            elif tag_name is 'date_of_birth' or tag_name is 'expiry_date':
+                # adjustment year is '-10' since a passport is valid for max 10 years, i.e. 280101 = 1 January 2028
+                value = self.format_date(value, -10)
+            elif tag_name is not 'mrz_data_elements':
+                print(value)
+                value = re.sub('<', '', value)
+
             clean_info.update({tag_name: value})
-        
+                
         if self.output:
             doc_number_tag = '5A'
             doc_number = dg1_data[doc_number_tag]

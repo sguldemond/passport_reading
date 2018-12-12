@@ -104,5 +104,20 @@ class TestPassportClass(unittest.TestCase):
         self.assertEqual(output_a, expected_output_a)
         self.assertEqual(output_b, expected_output_b)
 
+    def test_date_format_6(self):
+        """
+        Testing edge cases
+        """
+        input_a = "250101"
+        expected_output_a = "2025-01-01"
+
+        adjustment_years = -10
+
+        mrtd = MRTD(self.valid_mrz)
+        output_a = mrtd.format_date(input_a, adjustment_years)
+
+        self.assertEqual(output_a, expected_output_a)
+
+
 if __name__ == '__main__':
     unittest.main()

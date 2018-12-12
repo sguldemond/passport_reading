@@ -10,14 +10,29 @@ import ocr
 import config
 # Core
 import os, json, time, logging, sys, getopt
-from threading import Event
+from threading import Event, Thread
 
 class Main:
-    def start(self, api_url):
+    def __init__(self, api_url):
+        self.api_url = api_url
+        self.session = None
+        self.ready = None
+        self.socket_com = None
+        self.encryption_script = None
+        
+        self.mrz = None
+        self.mrtd_data = None
+        self.public_key = None
+        self.encrypted_data = None
+
+        self.started_mrz = False
+        self.started_mrtd = False
+
+    def start(self):
         """
         1) Setup session & import Zencode script
         """
-        # api_url = config.SERVER_CONFIG['api_url']
+        api_url = self.api_url
         logging.info("Connecting with: {}".format(api_url))
         self.session = OnboardingSession(api_url)
 
@@ -28,46 +43,70 @@ class Main:
         with open('zenroom/encrypt_message.lua', 'r') as input:
             self.encryption_script = input.read()
         
-        mrz = self._get_mrz()
-        mrtd_data = self._setup_mrtd(mrz)
-        qr_read = self._show_qr()
-        p_key = self._get_pkey()
-        encrypted_data = self._encrypt_data(mrtd_data, p_key)
-        data_attached = self._attach_data(encrypted_data)
-
-    def _get_mrz(self):
+        # self.get_mrz()
+                
+    def get_mrz(self):
         """
         2) Get MRZ from ID document, should become OCR
         """
-        return config.MRZ_CONFIG['mrz1']
+        self.mrz = config.MRZ_CONFIG['mrz1']
 
         # logging.info("Reading MRZ with OCR...")
-        # mrz = ocr.get_mrz()
-        # logging.info("MRZ read [{}]".format(mrz))
-        # return mrz
+        # self.mrz = ocr.get_mrz()
+        # logging.info("MRZ read [{}]".format(self.mrz))
 
-    def _setup_mrtd(self, mrz):
+    def loop_mrz(self):
+        if self.started_mrz == False:
+            # mrz_thread = Thread(target=self.get_mrz())
+            # mrz_thread.setDaemon(True)
+            # mrz_thread.start()
+
+            self.get_mrz()
+
+            self.started_mrz = True
+
+        if self.mrz:
+            return True
+        
+        return None
+
+    def setup_mrtd(self):
         """
         3) Setup MRTD and get data
         """
-        id_card = MRTD(mrz, True)
+        id_card = MRTD(self.mrz, True)
         
         personal_data = id_card.personal_data()
 
         if personal_data == None:
-            logging.error("DG1 could not be read, starting over...")
-            self.start()
+            logging.error("DG1 could not be read")
+            return False
 
         image_base64 = id_card.photo_data()
 
         if image_base64 == None:
-            logging.error("DG2 could not be read, starting over...")
-            self.start()
+            logging.error("DG2 could not be read")
+            return False
+
+        self.mrtd_data = [ {'personal_data': personal_data}, {'image_base64': image_base64} ]
+
+    def loop_mrtd(self):
+        if self.started_mrtd == False:
+            # mrtd_thread = Thread(target=self.setup_mrtd())
+            # mrtd_thread.setDaemon(True)
+            # mrtd_thread.start()
+
+            self.setup_mrtd()
+            
+            self.started_mrtd = True
+        
+        if self.mrtd_data:
+            return True
+
+        return None
 
 
-        return [ {'personal_data': personal_data}, {'image_base64': image_base64} ]
-
-    def _show_qr(self):
+    def show_qr(self):
         """
         4) Show QR code with session ID
         """
@@ -75,29 +114,24 @@ class Main:
         image_handler.qr_image(self.session.session_id)
 
         self.ready.wait()
-        return True
 
-    def _get_pkey(self):
+    def get_pkey(self):
         """
         5) Retrieve public key from session
         """
         session_data = self.session.get_data()
-        public_key = session_data['data']['public_key']
-        external_public_key = {'public': public_key}
+        p_key = session_data['data']['public_key']
+        self.public_key = {'public': p_key}
 
-        return external_public_key
-
-    def _encrypt_data(self, data, public_key):
+    def encrypt_data(self):
         """
         6) Encrypt data with public key
         """
         # for test purposes
-        # self._save_data(data_to_encrypt)
+        self._save_data(self.mrtd_data)
 
-        encrypted_data = zenroom_buffer.execute(self.encryption_script, json.dumps(public_key), json.dumps(data))
+        self.encrypted_data = zenroom_buffer.execute(self.encryption_script, json.dumps(self.public_key), json.dumps(self.mrtd_data))
 
-        return encrypted_data
-        
     def _save_data(self, data):
         """
         6.2) Save encrypted data for testing purposes
@@ -105,13 +139,11 @@ class Main:
         with open('output/test_data.json', 'w') as output:
             json.dump(data, output)
 
-    def _attach_data(self, data):
+    def attach_data(self):
         """
         7) Add encrypted data to session
         """
-        self.session.attach_encrypted_data(data)
-        
-        return True
+        self.session.attach_encrypted_data(self.encrypted_data)
 
 
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
@@ -124,5 +156,12 @@ arg = str(sys.argv)[13:][:5]
 if arg == "--dev":
     api_url = config.SERVER_CONFIG['dev']
 
-main = Main()
-main.start(api_url)
+main = Main(api_url)
+
+main.start()
+main.get_mrz()
+main.setup_mrtd()
+# main.show_qr()
+# main.get_pkey()
+# main.encrypt_data()
+# main.attach_data()
