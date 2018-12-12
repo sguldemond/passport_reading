@@ -28,19 +28,23 @@ class Main:
         with open('zenroom/encrypt_message.lua', 'r') as input:
             self.encryption_script = input.read()
         
-        self._get_mrz()
-        self._show_qr()
+        mrz = self._get_mrz()
+        mrtd_data = self._setup_mrtd(mrz)
+        qr_read = self._show_qr()
+        p_key = self._get_pkey()
+        encrypted_data = self._encrypt_data(mrtd_data, p_key)
+        data_attached = self._attach_data(encrypted_data)
 
     def _get_mrz(self):
         """
         2) Get MRZ from ID document, should become OCR
         """
-        # self._setup_mrtd(config.MRZ_CONFIG['mrz1'])
+        return config.MRZ_CONFIG['mrz1']
 
-        logging.info("Reading MRZ with OCR...")
-        mrz = ocr.get_mrz()
-        logging.info("MRZ read [{}]".format(mrz))
-        self._setup_mrtd(mrz)
+        # logging.info("Reading MRZ with OCR...")
+        # mrz = ocr.get_mrz()
+        # logging.info("MRZ read [{}]".format(mrz))
+        # return mrz
 
     def _setup_mrtd(self, mrz):
         """
@@ -48,17 +52,20 @@ class Main:
         """
         id_card = MRTD(mrz, True)
         
-        self.personal_data = id_card.personal_data()
+        personal_data = id_card.personal_data()
 
-        if self.personal_data == None:
-            sys.exit(1)
+        if personal_data == None:
+            logging.error("DG1 could not be read, starting over...")
+            self.start()
 
-        self.image_base64 = id_card.photo_data()
+        image_base64 = id_card.photo_data()
 
-        if self.image_base64 == None:
-            sys.exit(1)
+        if image_base64 == None:
+            logging.error("DG2 could not be read, starting over...")
+            self.start()
 
-        # print(self.personal_data)
+
+        return [ {'personal_data': personal_data}, {'image_base64': image_base64} ]
 
     def _show_qr(self):
         """
@@ -68,7 +75,7 @@ class Main:
         image_handler.qr_image(self.session.session_id)
 
         self.ready.wait()
-        self._get_pkey()
+        return True
 
     def _get_pkey(self):
         """
@@ -78,23 +85,19 @@ class Main:
         public_key = session_data['data']['public_key']
         external_public_key = {'public': public_key}
 
-        self._encrypt_data(external_public_key)
+        return external_public_key
 
-    def _encrypt_data(self, public_key):
+    def _encrypt_data(self, data, public_key):
         """
         6) Encrypt data with public key
         """
-        data_to_encrypt = []
-        data_to_encrypt.append({'personal_data': self.personal_data})
-        data_to_encrypt.append({'image_base64': self.image_base64})
-
         # for test purposes
-        self._save_data(data_to_encrypt)
+        # self._save_data(data_to_encrypt)
 
-        data = zenroom_buffer.execute(self.encryption_script, json.dumps(public_key), json.dumps(data_to_encrypt))
+        encrypted_data = zenroom_buffer.execute(self.encryption_script, json.dumps(public_key), json.dumps(data))
+
+        return encrypted_data
         
-        self._attach_data(data)
-
     def _save_data(self, data):
         """
         6.2) Save encrypted data for testing purposes
@@ -108,7 +111,7 @@ class Main:
         """
         self.session.attach_encrypted_data(data)
         
-        logging.info("Done, closing!")
+        return True
 
 
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
@@ -118,13 +121,8 @@ logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 api_url = config.SERVER_CONFIG['prod']
 
 arg = str(sys.argv)[13:][:5]
-# print(arg)
 if arg == "--dev":
     api_url = config.SERVER_CONFIG['dev']
 
-# print(api_url)
-
 main = Main()
 main.start(api_url)
-
-# main._get_mrz()

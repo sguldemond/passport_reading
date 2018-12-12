@@ -9,12 +9,13 @@ TODO:
 - document mambojumbo
 """
 def get_mrz():
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(0)
     tmp_file = 'tmp_capture.png'
     mrz_list = None
-    sleep_time = .100
+    sleep_time = .5
     logging.info("Checking for valid MRZ every {0} seconds".format(sleep_time))
     
+    i = 0
     while(True):
         _, frame = cap.read()
         cv2.imwrite(tmp_file, frame)
@@ -23,7 +24,7 @@ def get_mrz():
         except ValueError as e:
             logging.warning(e.message)
             continue
-        # print("Trying...")
+        print("Trying... [{0}]".format(time.ctime()))
         if mrz != None:
             mrz_list = [mrz.number, mrz.date_of_birth, mrz.expiration_date]
             print(mrz_list)
@@ -33,12 +34,14 @@ def get_mrz():
                 mrz_list = [valid_number, mrz.date_of_birth, mrz.expiration_date]
                 print(mrz_list)
                 break
-        
+        i += 1
         time.sleep(sleep_time)
 
-    cap.release()
-    cv2.destroyAllWindows()
+    # cap.release()
+    # cv2.destroyAllWindows()
+
     os.remove(tmp_file)
+
     return mrz_list
 
 def validate_doc_number(number, check_number):
