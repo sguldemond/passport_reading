@@ -7,7 +7,7 @@ from pypassport.iso7816 import Iso7816Exception
 
 from image_handler import convert_jp2
 
-import json, logging, re
+import json, logging, re, time
 from datetime import datetime
 
 class MRTD:
@@ -19,7 +19,7 @@ class MRTD:
     """
     def __init__(self, mrz=None, output=False):
         if(type(mrz) is list):
-            #                    doc_nr, dob,    exp_nr
+            #                    doc_nr, dob,    exp_date
             mrz = self._buildMRZ(mrz[0], mrz[1], mrz[2])
 
         self.mrz_string = mrz
@@ -29,6 +29,7 @@ class MRTD:
         self.dg1_retries = 0
         self.dg2_retries = 0
         self.max_retries = 3
+        self.rm = ReaderManager()
     
     def do_bac(self):
         self.epassport.doBasicAccessControl()
@@ -37,7 +38,10 @@ class MRTD:
         if self.reader_obj != None:
             return
         
+        rm = self.rm
+
         rm = ReaderManager()
+        
         logging.info("Waiting for card...")
         try:
             self.reader_obj = rm.waitForCard()
@@ -47,6 +51,13 @@ class MRTD:
 
         logging.info("Card detected!")
     
+    def wait_for_card(self):
+        reader = self.rm._autoDetect()
+        
+        if reader:
+            self.reader_obj = reader
+            return True
+
     def check_mrz(self, mrz_string):
         mrz_obj = mrz.MRZ(mrz_string)
         return mrz_obj.checkMRZ()
@@ -94,7 +105,6 @@ class MRTD:
                 # adjustment year is '-10' since a passport is valid for max 10 years, i.e. 280101 = 1 January 2028
                 value = self.format_date(value, -10)
             elif tag_name is not 'mrz_data_elements':
-                print(value)
                 value = re.sub('<', '', value)
 
             clean_info.update({tag_name: value})

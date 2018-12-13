@@ -34,12 +34,12 @@ class OCR:
         # print("Trying...")
         if mrz != None:
             mrz_list = [mrz.number, mrz.date_of_birth, mrz.expiration_date]
-            print(mrz_list)
+            logging.info("OCR: checking string [{}]".format(mrz_list))
 
             valid_number = self.validate_doc_number(mrz.number, mrz.check_number)
             if (valid_number != None) & mrz.valid_date_of_birth & mrz.valid_expiration_date:
                 mrz_list = [valid_number, mrz.date_of_birth, mrz.expiration_date]
-                print(mrz_list)
+                # print(mrz_list)
 
                 os.remove(tmp_file)
 

@@ -23,7 +23,7 @@ from PIL.ImageChops import screen
 # ==== global instances ====
 
 app = None
-api_url = config.SERVER_CONFIG['prod']
+api_url = config.SERVER_CONFIG['dev']
 backend = Main(api_url)
 backend.start()
 
@@ -45,19 +45,23 @@ Config.write()
 SCREENS = [
         
         {
+            'name' : 'init',
+            'image' : 'assets/start.png',
+        },
+        {
             'name' : 'start',
             'image' : 'assets/start.png',
             'action' : {
-                    'loop_func' : None, # function to execute and loop untill there is data
-                    'on_data_command' : 'NEXT_SCREEN', # when receiving data
-                    'on_data_param' : 'start'
+                    'loop_func' : backend.read_card,
+                    'on_data_command' : 'NEXT_SCREEN',
+                    'on_data_param' : 'reading'
                 }
         },
         {
             'name' : 'reading',
             'image' : 'assets/reading.png',
             'action' : {
-                    'loop_func' : backend.get_mrz,
+                    'loop_func' : backend.read_data,
                     'on_data_command' : 'NEXT_SCREEN',
                     'on_data_param' : 'qr-code'
                 }
@@ -66,10 +70,23 @@ SCREENS = [
             'name' : 'qr-code',
             'image' : 'assets/scan.png',
             'action' : {
-                    'loop_func' : backend.test_loop,
+                    'loop_func' : backend.wait_for_pkey,
                     'on_data_command' : 'NEXT_SCREEN',
-                    'on_data_param' : 'start'
+                    'on_data_param' : 'encrypting'
                 }
+        },
+        {
+            'name' : 'encrypting',
+            'image' : 'assets/encrypting.png',
+            'action' : {
+                    'loop_func' : backend.wait_for_encryption,
+                    'on_data_command' : 'NEXT_SCREEN',
+                    'on_data_param' : 'thank-you'
+                }
+        },
+        {
+            'name' : 'thank-you',
+            'image' : 'assets/thankyou.png',
         },
         
     ]

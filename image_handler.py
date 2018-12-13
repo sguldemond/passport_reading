@@ -38,3 +38,6 @@ def qr_image(input):
 
     qr = Image.open('qr.png')
     qr.show()
+
+def get_qr(input):
+    return qrcode.make(input, image_factory=PymagingImage)
