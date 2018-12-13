@@ -87,6 +87,12 @@ SCREENS = [
         {
             'name' : 'thank-you',
             'image' : 'assets/thankyou.png',
+            'action' : {
+                    'loop_func' : backend.test_loop,
+                    'on_data_command' : 'NEXT_SCREEN',
+                    'on_data_param' : 'start'
+                }
+
         },
         
     ]

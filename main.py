@@ -109,9 +109,9 @@ class Main:
         
         else:
             logging.info("MRTD: Reading DG2 (portrait image)...")
-            self.portrait_image = mrtd.photo_data()
+            portrait_image = mrtd.photo_data()
 
-        if self.personal_data and self.portrait_image:
+            self.mrtd_data = [ {'personal_data': self.personal_data}, {'image_base64': portrait_image} ]
             self.show_qr()
             return image_handler.get_qr(self.session.session_id)
 
