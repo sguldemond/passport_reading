@@ -49,6 +49,10 @@ class OCR:
 
         return None
 
+    def end_capture(self):
+        self.cap.release()
+        # cv2.destroyAllWindow()
+
     def validate_doc_number(self, number, check_number):
         for number in self.permutations(number):
             computed_check_number = MRZCheckDigit.compute(number)

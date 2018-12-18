@@ -40,4 +40,9 @@ def qr_image(input):
     qr.show()
 
 def get_qr(input):
-    return qrcode.make(input, image_factory=PymagingImage)
+    image = qrcode.make(input)
+
+    filename = "{}.png".format("tmp-qr")
+    image.save(filename)
+
+    return filename

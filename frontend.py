@@ -14,7 +14,6 @@ from kivy.core.window import Window
 from kivy.config import Config
 from kivy.clock import Clock
 
-import config
 from main import Main
 
 import logging
@@ -23,8 +22,7 @@ from PIL.ImageChops import screen
 # ==== global instances ====
 
 app = None
-api_url = config.SERVER_CONFIG['dev']
-backend = Main(api_url)
+backend = Main()
 backend.start()
 
 # ==== SETTINGS ==== #
@@ -69,6 +67,7 @@ SCREENS = [
         {
             'name' : 'qr-code',
             'image' : 'assets/scan.png',
+            'dynamic_image' : 'qrcode',
             'action' : {
                     'loop_func' : backend.wait_for_pkey,
                     'on_data_command' : 'NEXT_SCREEN',
@@ -88,7 +87,7 @@ SCREENS = [
             'name' : 'thank-you',
             'image' : 'assets/thankyou.png',
             'action' : {
-                    'loop_func' : backend.test_loop,
+                    'loop_func' : backend.reset_loop,
                     'on_data_command' : 'NEXT_SCREEN',
                     'on_data_param' : 'start'
                 }
@@ -236,11 +235,11 @@ class ScreenApp(App):
         
         if loop_func:
             self.logger.info("ScreenApp: do_loop: run '{}'".format(loop_func.__name__))
-            # result = loop_func(self.data) # we provide the current data store to processes
-            result = loop_func()
+            result = loop_func(self.data)
         
             if result is not None: 
                 self.logger.info("result: {0}".format(result))
+                self.data.update(result) # update the current state with the data we just got
                 # trigger command
                 self.handle_on_data( on_data_command, on_data_param)
             else:
@@ -277,11 +276,27 @@ class ScreenApp(App):
     def goto_screen(self, screen):
         
         self.logger.info("ScreenApp: goto screen '{0}'".format(screen.get('name')) )
+        self.logger.info("Current state self.data: {0}".format(self.data))
         
         self.cur_screen = screen
         self.cur_screen_index = self.screens.index(screen)
         self.screen_manager.current = screen.get('name') # # activate screen in screen manager
         
+        # set dynamic content for current screen
+        screen_widget = self.screen_manager.get_screen(screen.get('name'))
+        print screen_widget.children
+        if len(screen_widget.children) == 2: # HACKY: remove existing dynamic image
+            screen_widget.remove_widget(screen_widget.children[0]) # turns out that the first is the last ( TODO: make more robust with labels? )
+        
+        # if dynamic image is set make one; given by filename of file locally stored
+        if screen.get('dynamic_image'):
+            dynamic_image_data_key = screen.get('dynamic_image')
+            image_file_name = self.data.get(dynamic_image_data_key)
+            dynamic_image_widget = Image(source=image_file_name)
+            screen_widget.add_widget(dynamic_image_widget)
+            
+            self.logger.info("Dynamic image for screen {0} with image {1}".format(screen.get('name'), image_file_name))
+
         self.set_loop_handler(self.cur_screen)
     
     

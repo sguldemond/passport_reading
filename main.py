@@ -13,17 +13,21 @@ import os, json, time, logging, sys, getopt
 from threading import Event, Thread
 
 class Main:
-    def __init__(self, api_url):
-        self.api_url = api_url
-        self.session = None
-        self.ready = None
-        self.socket_com = None
-        self.encryption_script = None
-        
-        self.ocr = OCR()
-        self.mrtd = None
-        self.reader = None
+    def __init__(self):
+        self.api_url = config.SERVER_CONFIG['dev']
 
+        with open('zenroom/encrypt_message.lua', 'r') as input:
+            self.encryption_script = input.read()
+
+        self._init_fields()
+
+
+    def _init_fields(self):
+        self.session = None
+
+        self.ocr = OCR()
+        self.reader = None
+        self.mrtd = None
         self.mrz = None
         self.mrtd_data = None
         self.public_key = None
@@ -46,25 +50,21 @@ class Main:
         # self.socket_com = SocketCom(self.ready, api_url)
         # self.socket_com.join_room(self.session.session_id)
 
-        with open('zenroom/encrypt_message.lua', 'r') as input:
-            self.encryption_script = input.read()
-        
-        # self.get_mrz()
-                
+                    
     def get_mrz(self):
         """
         2) Get MRZ from ID document, should become OCR
         """
-        mrz = config.MRZ_CONFIG['mrz1']
+        # mrz = config.MRZ_CONFIG['mrz1']
 
-        # mrz = ocr.get_mrz()
+        mrz = self.ocr.get_mrz()
 
         return mrz
 
     def get_mrtd(self):
         return self.mrtd.wait_for_card()
 
-    def read_card(self):
+    def read_card(self, data={}):
         mrz = self.mrz
         if mrz is None:
             logging.info("MRTD: Trying to read MRZ...")
@@ -72,12 +72,14 @@ class Main:
 
             if mrz:
                 logging.info("MRTD: MRZ received [{}]".format(mrz))
+                self.ocr.end_capture()
                 self.mrtd = MRTD(mrz)
                 self.mrz = mrz
         
         else:
             logging.info("MRTD: Waiting for card...")
-            return self.get_mrtd()
+            if self.get_mrtd():
+                return { "mrtd": True }
         
     def setup_mrtd(self):
         """
@@ -100,7 +102,7 @@ class Main:
 
         self.mrtd_data = [ {'personal_data': personal_data}, {'image_base64': image_base64} ]
 
-    def read_data(self):
+    def read_data(self, data={}):
         mrtd = self.mrtd
 
         if self.personal_data is None:
@@ -112,8 +114,12 @@ class Main:
             portrait_image = mrtd.photo_data()
 
             self.mrtd_data = [ {'personal_data': self.personal_data}, {'image_base64': portrait_image} ]
-            self.show_qr()
-            return image_handler.get_qr(self.session.session_id)
+
+            # self.show_qr()
+
+            qr_file = image_handler.get_qr(self.session.session_id)
+
+            return { 'qrcode': qr_file }
 
     def test_loop(self):
         self.i += 1
@@ -121,6 +127,16 @@ class Main:
         if self.i is 10:
             self.i = 0
             return True
+
+    def reset_loop(self, data={}):
+        self.i += 1
+
+        if self.i is 6:
+            logging.info("MRTD: Resetting...")
+            self._init_fields()
+            self.start()
+            return { "reset": True }
+
 
     def show_qr(self):
         """
@@ -131,12 +147,12 @@ class Main:
 
         # self.ready.wait()
 
-    def wait_for_pkey(self):
+    def wait_for_pkey(self, data={}):
         status = self.session.get_status()
         logging.info("MRTD: Session status is [{}]".format(status))
         if status == "GOT_PUB_KEY":
             self.get_pkey()
-            return True
+            return { "got_pkey": True }
 
     def get_pkey(self):
         """
@@ -155,16 +171,17 @@ class Main:
 
         self.encrypted_data = zenroom_buffer.execute(self.encryption_script, json.dumps(self.public_key), json.dumps(self.mrtd_data))
 
-    def wait_for_encryption(self):
+    def wait_for_encryption(self, data={}):
         if self.encrypted_data is None:
             self.encrypt_data()
             self.attach_data()
-
-        if self.i is 5:
-            self.i = 0
-            return True
         
-        self.i += 1
+        else:
+            if self.i is 2:
+                self.i = 0
+                return { "data_encrypted": True }
+            
+            self.i += 1
 
     def _save_data(self, data):
         """
@@ -190,7 +207,7 @@ arg = str(sys.argv)[13:][:5]
 if arg == "--dev":
     api_url = config.SERVER_CONFIG['dev']
 
-# main = Main(api_url)
+# main = Main()
 
 # main.start()
 # main.get_mrz()
