@@ -43,9 +43,9 @@ class Main:
         1) Setup session & import Zencode script
         """
         api_url = self.api_url
-        logging.info("MRTD: Connecting with {}".format(api_url))
 
-        # self.session = OnboardingSession(api_url)
+        logging.info("MRTD: Connecting with {}".format(api_url))
+        self.session = OnboardingSession(api_url)
 
     def get_mrz(self):
         """
@@ -60,15 +60,17 @@ class Main:
     def get_mrtd(self):
         return self.mrtd.wait_for_card()
 
-    def wait_for_card(self):
+    def wait_for_card(self, data={}):
         # wait for nfc reader to detect a card
+
+        mrtd = None
 
         if mrtd is None:
             mrtd = MRTD()
 
-        return mrtd.wait_for_card()
-        
-        print("Card detected!")
+        if mrtd.wait_for_card():
+            print("Card detected!")
+            return { "card": True }
 
 
     def read_card(self, data={}):
@@ -124,7 +126,9 @@ class Main:
 
             # self.show_qr()
 
-            qr_file = image_handler.get_qr(self.session.session_id)
+            qr_file = image_handler.get_qr("https://decode.amsterdam/onboarding?id=" + self.session.session_id)
+
+            # qr_file = image_handler.get_qr("https://decode.amsterdam/onboarding/1234")
 
             return { 'qrcode': qr_file }
 
@@ -156,6 +160,7 @@ class Main:
 
     def wait_for_pkey(self, data={}):
         status = self.session.get_status()
+
         logging.info("MRTD: Session status is [{}]".format(status))
         if status == "GOT_PUB_KEY":
             self.get_pkey()
@@ -214,6 +219,5 @@ arg = str(sys.argv)[13:][:5]
 if arg == "--dev":
     api_url = config.SERVER_CONFIG['dev']
 
-
-main = Main()
+# main = Main()
 # main.wait_for_card()

@@ -45,15 +45,19 @@ SCREENS = [
         {
             'name' : 'init',
             'image' : 'assets/start.png',
-            # 'action' : {
-            #     'loop_func' : backend.wait_for_card,
-            #     'on_data_command' : 'NEXT_SCREEN',
-            #     'on_data_param' : 'start'
-            # }
         },
         {
             'name' : 'start',
             'image' : 'assets/start.png',
+            'action' : {
+                'loop_func' : backend.wait_for_card,
+                'on_data_command' : 'NEXT_SCREEN',
+                'on_data_param' : 'ocr'
+            }
+        },
+        {
+            'name' : 'ocr',
+            'image' : 'assets/reading.png',
             'action' : {
                     'loop_func' : backend.read_card,
                     'on_data_command' : 'NEXT_SCREEN',
