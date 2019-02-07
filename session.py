@@ -51,6 +51,7 @@ class OnboardingSession:
         data = {"session_id": self.session_id}
         try:
             response = requests.post("{0}/{1}".format(self.api_url, 'get_session'), json=data)
+            print(response)
             return response.json()['response']
         except ConnectionError as e:
             logging.error(e)

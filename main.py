@@ -14,7 +14,7 @@ from threading import Event, Thread
 
 class Main:
     def __init__(self):
-        self.api_url = config.SERVER_CONFIG['dev']
+        self.api_url = config.SERVER_CONFIG['prod']
 
         with open('zenroom/encrypt_message.lua', 'r') as input:
             self.encryption_script = input.read()
@@ -44,13 +44,9 @@ class Main:
         """
         api_url = self.api_url
         logging.info("MRTD: Connecting with {}".format(api_url))
-        self.session = OnboardingSession(api_url)
 
-        # self.ready = Event()
-        # self.socket_com = SocketCom(self.ready, api_url)
-        # self.socket_com.join_room(self.session.session_id)
+        # self.session = OnboardingSession(api_url)
 
-                    
     def get_mrz(self):
         """
         2) Get MRZ from ID document, should become OCR
@@ -63,6 +59,17 @@ class Main:
 
     def get_mrtd(self):
         return self.mrtd.wait_for_card()
+
+    def wait_for_card(self):
+        # wait for nfc reader to detect a card
+
+        if mrtd is None:
+            mrtd = MRTD()
+
+        return mrtd.wait_for_card()
+        
+        print("Card detected!")
+
 
     def read_card(self, data={}):
         mrz = self.mrz
@@ -207,12 +214,6 @@ arg = str(sys.argv)[13:][:5]
 if arg == "--dev":
     api_url = config.SERVER_CONFIG['dev']
 
-# main = Main()
 
-# main.start()
-# main.get_mrz()
-# main.setup_mrtd()
-# main.show_qr()
-# main.get_pkey()
-# main.encrypt_data()
-# main.attach_data()
+main = Main()
+# main.wait_for_card()
