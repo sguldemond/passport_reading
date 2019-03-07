@@ -2,6 +2,8 @@
 
 This Passport Scanner is part of the Decode Amsterdam project. For more extended information check out the [Decode Amsterdam]() repository.
 
+![the box image](the_box/the_box_small.jpg)
+
 In this repository you will everything you need to create your own Passport Scanner. It could be used stand alone to read data of the NFC chip inside a passport, but it's full potential is to read the data and then make it available from transfer to the Decode Amsterdam PWA.
 
 **Important note:**
@@ -47,78 +49,86 @@ The camera is used to read the MRZ (Machine Readable Zone) on a passport which o
 Any modern webcam will do, as long as it has a decent resolution to perform OCR. We ended up using the [Razer Kiyo](https://www.razer.com/gaming-broadcaster/razer-kiyo). We modified it by removing the stand so only the camera was left, this way it fit nicely in the box.
 
 
+### The Box
+
+The box combines all the hardware in to one physical element. For our setup we used three more elements to complete the setup:
+* PC, Intel NUC i5 with BX500 120GB SSD & Crucial 4GB DDR RAM
+* Monitor, [Seeed 10.1 inch LCD display](https://www.seeedstudio.com/10-1-Inch-LCD-Display-1366x768-HDMI-VGA-NTSC-PAL-p-1586.html)
+* Keyboard, [Logitech K400 Wireless Touch](https://www.logitech.com/en-us/product/wireless-touch-keyboard-k400r)
+
+In the folder `the_box` you can a Sketch Up file of this render:
+
+![the box image](the_box/the_box_render.png)
+
+All the AutoCAD files (`.dxf`) to laser cut the different pieces are also available there.
+
+
+
 ## Setup
 
+Install virtualenv:
+```
+$ pip install virtualenv
+```
 
+Find your local python executable:
+```
+$ python -c "import sys; print sys.executable"
+```
+
+Setup new virtualenv using this location:
+```
+$ virtualenv --python=/usr/bin/python venv
+```
+
+Then activate it:
+```
+$ source venv/bin/activate
+```
+
+Install the requirements:
+```
+(venv) $ pip install -r requirements.txt
+```
+
+Now you can install the modified version of PyPassport:
+```
+$ git clone https://github.com/landgenoot/pypassport-2.0
+$ cd pypassport-2.0
+(venv) $ pip install .
+```
+
+Create config file:
+```
+```
+
+Setup Session Manager API:
+```
+```
 
 
 ## Run
 
-There must be a file present named `mrz.json` containing the MRZ of the document thats on the scanner.
-Also a folder named `output` must be present.
 
 ```
-$ python reader.py
+$ python frontend.py
 ```
 
+This should start connecting the de Session Manager and eventually show the first screen.
 
-## Available projects
+
+## Appendix
+
+### ICAO Doc 9303
+
+The standard around Machine Readable Travel Documents can be found at [here](https://www.icao.int/publications/pages/publication.aspx?docnum=9303)
+
 
 ### ePassportViewer
 - [Origin](https://github.com/andrew867/epassportviewer)
 - [GitHub mirror](https://github.com/andrew867/epassportviewer)
 
-It is supported by the pypassport python library, which can be found in the same repository.
+It is supported by the PyPassport python library, which can be found in the same repository.
 
 These projects have been actively investigated. It takes some time to get all the needed software installed since main project was last updated 4 years ago. But the viewer and pypassport library are working.
 We got stuck at reading the passport information.
-
-To experiment with changes in the pypassport library you need to reinstall it every time.
-This is done inside a virtual environment.
-
-#### Changes made so far
-
-Changing protocol from T0 to T1, based on experiments done using [gscriptor](ludovic.rousseau.free.fr/softwares/pcsc-tools/)
-```
-# self._pcsc_connection.connect(self.sc.scard.SCARD_PCI_T0)
-self._pcsc_connection.connect(self.sc.scard.SCARD_PCI_T1)
-```
-pypassport > reader.py > class PcscReader > def connect: 
-
-Adding this line,
-```
-mrz = self._mrz
-```
-to pypassport > doc9303 > mrz.py > class MRZ > def _checkDigitsTD1 & def _checkDigitsTD2
-
-When running the 'EPassport.readPassport' method we came across an error with this message:
-```
-('Data not found:', '6F63')
-```
-This is most likely a merging of the '6F' and '63' which are the locations of DG15 (Public Keys) and DG3 (Finger Print) respectively on the LDS (Logical Data Structure). For some reason these two tags are stored conjoined in the common file, which contains a list of available DG's. This list can be read using 'EPassport.readCom'.
-
-I added this code to 'readCom', which does not yet fix the whole problem:
-```
-# Temp fix for 6F63 Data not found issue
-double_tag = False
-ef_com = self["Common"]["5C"]
-for tag in ef_com:
-  if tag == "6F63":
-  ef_com.append("6F")
-  ef_com.append("63")
-  double_tag = True
-        
-  if double_tag:
-  ef_com.remove("6F63")
-        
- # print(ef_com)
- ###
-```
-
-For some reason DG15 returns empty and for DG3 the 'securty status is not satisfied'.
-For now this can be skipped, with the info from DG15 (public keys) the info on the NFC can be varified as valid, but this is not relevant for us at this moment. We also don't need DG3 (Finger Print).
-
-
-## Relevant information
-
-The standard around Machine Readable Travel Documents can be found at [ICAO Doc 9303](https://www.icao.int/publications/pages/publication.aspx?docnum=9303)

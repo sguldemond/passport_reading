@@ -3,7 +3,7 @@
 .vscode/
 output/
 python2/
-clean_venv/
+venv/
 
 # files
 mrz.json
