@@ -1,17 +1,32 @@
-# Passport reading
+# Decode Passport Scanner
 
-## Run
+This Passport Scanner is part of the Decode Amsterdam project. For more extended information check out the [Decode Amsterdam]() repository.
 
-There must be a file present named `mrz.json` containing the MRZ of the document thats on the scanner.
-Also a folder named `output` must be present.
+In this repository you will everything you need to create your own Passport Scanner. It could be used stand alone to read data of the NFC chip inside a passport, but it's full potential is to read the data and then make it available from transfer to the Decode Amsterdam PWA.
 
-```
-$ python reader.py
-```
+**Important note:**
+This project was created as a proof of concept prototype. There for it was never meant to be used on a large scale but for demonstration purposes only.
 
-## Testing scanner
+In this repository you will find the following:
 
-The scanner we're using is the [ACS ACR1252U-M1](https://www.acs.com.hk/en/products/342/acr1252u-usb-nfc-reader-iii-nfc-forum-certified-reader/), supported by the [CCID driver](https://ccid.apdu.fr/). All done on an Ubuntu 18.04 machine.
+* Code for communication with different hardware elements
+* Code for communication with the [Decode Session Manager]()
+* Documentation for building a physical box to combine all hardware elements 
+
+The code and hardware has only been tested using Ubuntu 18.04.
+
+
+## Hardware
+
+There are different hardware elements needed to get the party started.
+
+### NFC Reader
+
+Before we start it is good to mention there is a specific library being used to handle all the complicated interaction between a NFC scanner and the NFC chip in a passport. This library, PyPassport, needed to be modified slightly in order to work with the NFC readers we had available. This modified version can be found as a submodule of this project and [here](). The library it self is using the standard of Machine Readable Travel Documents (MRTD) as defined in [ICAO Doc 9303](https://www.icao.int/publications/pages/publication.aspx?docnum=9303). 
+
+The NFC reader we ended up using is the [ACS ACR1252U-M1](https://www.acs.com.hk/en/products/342/acr1252u-usb-nfc-reader-iii-nfc-forum-certified-reader/), supported by the [CCID driver](https://ccid.apdu.fr/).
+
+#### Testing the NFC Reader
 
 List all USB devices: `$ lsusb`
 
@@ -23,6 +38,29 @@ Start PCSC in the background:
 
 Using [pcsc-tools](http://ludovic.rousseau.free.fr/softwares/pcsc-tools/) chips on the scanner can be read, PCSC needs te be started for this:
 `$ pcsc_scan`
+
+
+### Camera
+
+The camera is used to read the MRZ (Machine Readable Zone) on a passport which on its turn it used to decrypt the data on the passport's NFC chip.
+
+Any modern webcam will do, as long as it has a decent resolution to perform OCR. We ended up using the [Razer Kiyo](https://www.razer.com/gaming-broadcaster/razer-kiyo). We modified it by removing the stand so only the camera was left, this way it fit nicely in the box.
+
+
+## Setup
+
+
+
+
+## Run
+
+There must be a file present named `mrz.json` containing the MRZ of the document thats on the scanner.
+Also a folder named `output` must be present.
+
+```
+$ python reader.py
+```
+
 
 ## Available projects
 
@@ -80,53 +118,6 @@ for tag in ef_com:
 For some reason DG15 returns empty and for DG3 the 'securty status is not satisfied'.
 For now this can be skipped, with the info from DG15 (public keys) the info on the NFC can be varified as valid, but this is not relevant for us at this moment. We also don't need DG3 (Finger Print).
 
-#### Processing face image
-
-The face image is located in DG2 (DG is short for Data Group), corrosponding with tag '75', more info about this can be found at ICAO Doc 9303. It is formatted in JPEG2000 (jp2), so in order to use it properly it should be converted to another format like jpg or png.
-
-The pypassport module provides some code thats shows how to do this, but in order for this to work some libraries have to be installed first.
-
-First install [JasPer](http://www.ece.uvic.ca/~frodo/jasper/), this is used by GraphicsMagick and handles JPEG2000 files
-It is available [here](https://github.com/mdadams/jasper), but the build and install process is quite unfriendly. I ended up with the following process:
-
-```
-$ git clone https://github.com/xorgy/graphicsmagick
-$ cd graphicsmagick/jp2
-$ export CFLAGS="-O2 -fPIC"
-$ ./configure
-$ make
-$ sudo make install
-```
-
-Then install GraphicsMagick, image processing software, from anywhere [here](http://www.graphicsmagick.org/download.html), I used version 1.3.30.
-```
-$ 'Download from web & enter folder'
-$ ./configure --with-modules --enable-shared=yes --disable-installed
-$ make
-$ sudo make install
-$ sudo ldconfig // 'For security and performance reasons, Linux maintains a cache of the shared libraries installed in "approved" locations and this command will update it.'
-```
-
-GraphicsMagick should support JPEG2000 now, you can check this by running:
-```
-$ gm version
-```
-It should list `JPEG-2000 ... yes` under `Feature Support`.
-
-Finally install [pgmagick](https://github.com/hhatto/pgmagick), which is a "boost.python based wrapper for GraphicsMagick" 
-```
-$ git clone https://github.com/hhatto/pgmagick
-$ cd pgmagick
-$ python setup.py install
-```
-Do not install pgmagick through `pip`, this version includes its own version of GraphicsMagick which will not support JPEG2000.
-
-### JMRTD
-> "An Open Source Java Implementation of Machine Readable Travel Documents"
-- [Homepage](https://jmrtd.org/)
-
-Used by ReadID app.
-Has not been investigated yet.
 
 ## Relevant information
 
