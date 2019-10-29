@@ -26,6 +26,8 @@ backend = Main()
 backend.start()
 
 # ==== SETTINGS ==== #
+# Config.set('kivy', 'log_enable', 1)
+# Config.set('kivy', 'log_level', 'debug')
 
 Config.set('graphics', 'width', '768')
 Config.set('graphics', 'height', '1366')
@@ -157,7 +159,7 @@ class ScreenApp(App):
     
     def _keyboard_closed(self):
         
-        self._keyboard.unbind(on_key_down=self._on_keyboard_down)
+        # self._keyboard.unbind(on_key_down=self._on_keyboard_down)
         self._keyboard = None
         
     # ----

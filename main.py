@@ -126,7 +126,8 @@ class Main:
 
             # self.show_qr()
 
-            qr_file = image_handler.get_qr("https://decode.amsterdam/onboarding?id=", self.session.session_id)
+            # qr_file = image_handler.get_qr("https://decode.amsterdam/onboarding?id=", self.session.session_id)
+            qr_file = image_handler.get_qr("", self.session.session_id)
 
             return { 'qrcode': qr_file }
 
@@ -211,13 +212,13 @@ logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 
 # print(str(sys.argv))
 
-api_url = config.SERVER_CONFIG['prod']
+# api_url = config.SERVER_CONFIG['prod']
 
-arg = str(sys.argv)[13:][:5]
-if arg == "--dev":
-    api_url = config.SERVER_CONFIG['dev']
+# arg = str(sys.argv)[13:][:5]
+# if arg == "--dev":
+#     api_url = config.SERVER_CONFIG['dev']
 
-main = Main()
+# main = Main()
 # main.wait_for_card()
-main.start()
-main.get_mrz()
+# main.start()
+# main.get_mrz()
