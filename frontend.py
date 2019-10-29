@@ -57,7 +57,7 @@ SCREENS = [
         },
         {
             'name' : 'ocr',
-            'image' : 'assets/reading.png',
+            'image' : 'assets/reading_key.png',
             'action' : {
                     'loop_func' : backend.read_card,
                     'on_data_command' : 'NEXT_SCREEN',
@@ -66,7 +66,7 @@ SCREENS = [
         },
         {
             'name' : 'reading',
-            'image' : 'assets/reading.png',
+            'image' : 'assets/reading_nfc.png',
             'action' : {
                     'loop_func' : backend.read_data,
                     'on_data_command' : 'NEXT_SCREEN',
@@ -75,7 +75,7 @@ SCREENS = [
         },
         {
             'name' : 'qr-code',
-            'image' : 'assets/scan.png',
+            'image' : 'assets/scan_qr_code.png',
             'dynamic_image' : 'qrcode',
             'action' : {
                     'loop_func' : backend.wait_for_pkey,
@@ -94,7 +94,7 @@ SCREENS = [
         },
         {
             'name' : 'thank-you',
-            'image' : 'assets/thankyou.png',
+            'image' : 'assets/thank_you.png',
             'action' : {
                     'loop_func' : backend.reset_loop,
                     'on_data_command' : 'NEXT_SCREEN',

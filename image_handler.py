@@ -39,10 +39,10 @@ def qr_image(input):
     qr = Image.open('qr.png')
     qr.show()
 
-def get_qr(input):
-    image = qrcode.make(input)
+def get_qr(url, input):
+    image = qrcode.make(url + input)
 
-    filename = "{}.png".format("tmp-qr")
+    filename = "output/qr-{}.png".format(input)
     image.save(filename)
 
     return filename
