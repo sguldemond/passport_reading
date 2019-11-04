@@ -4,6 +4,9 @@
 output/
 python2/
 clean_venv/
+ocr-venv/
+pypassport/
+venv/
 
 # files
 mrz.json

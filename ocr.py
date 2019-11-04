@@ -4,10 +4,9 @@ from PIL import Image
 import cv2
 
 import os, time, io, re, logging
-"""
-TODO:
-- document mambojumbo
-"""
+import threading
+
+logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.INFO)
 
 class OCR:
 
@@ -16,24 +15,27 @@ class OCR:
         self.tmp_file = 'tmp_capture.png'
         self.mrz_list = None
         self.sleep_time = .5
+        self.finished = False
 
     def get_mrz(self):
-        # logging.info("Checking for valid MRZ every {0} seconds".format(sleep_time))
         
         tmp_file = self.tmp_file
         mrz_list = self.mrz_list
 
         _, frame = self.cap.read()
         cv2.imwrite(tmp_file, frame)
+
         try:
             mrz = read_mrz(tmp_file)
+            logging.info(mrz)
         except ValueError as e:
-            logging.warning(e.message)
+            logging.warning("Something went wrong...")
             return None
 
-        # print("Trying...")
+        print("Trying...")
         if mrz != None:
             mrz_list = [mrz.number, mrz.date_of_birth, mrz.expiration_date]
+            # print("OCR: checking string [{}]".format(mrz_list))
             logging.info("OCR: checking string [{}]".format(mrz_list))
 
             valid_number = self.validate_doc_number(mrz.number, mrz.check_number)
@@ -45,13 +47,11 @@ class OCR:
 
                 return mrz_list
 
-        time.sleep(self.sleep_time)
-
         return None
 
     def end_capture(self):
         self.cap.release()
-        # cv2.destroyAllWindow()
+        cv2.destroyAllWindows()
 
     def validate_doc_number(self, number, check_number):
         for number in self.permutations(number):
@@ -81,9 +81,43 @@ class OCR:
             result = [s]
 
         return result
+    
+    def find_mrz(self):
+        time.sleep(3)
+        while True:
+            res = self.get_mrz()
+
+            if res:
+                self.finished = True
+                logging.info("Result: {}".format(res))
+                break
+                
+            time.sleep(self.sleep_time)
+        
+        self.end_capture()
+
+    def webcam(self):
+        while True:
+            if self.finished:
+                break
+
+            ret, frame = self.cap.read()
+            cv2.imshow('webcam', frame)
+
+            c = cv2.waitKey(1)
+            if c == 27:
+                break
+        
+        self.end_capture() 
 
 # print(permutations(""))
 # print(permutations("aObOcOd", "", "b", "XYZ"))
 # print(permutations("NOHFO7F71"))
 
-# get_mrz()
+ocr = OCR()
+
+webcam_thread = threading.Thread(name='webcam', target=ocr.webcam)
+mrz_thread = threading.Thread(name='mrz', target=ocr.find_mrz)
+
+webcam_thread.start()
+mrz_thread.start()
