@@ -11,7 +11,7 @@ kiwisolver==1.0.1
 matplotlib==2.2.3
 networkx==2.2
 numpy==1.15.4
-opencv-python==3.4.4.19
+opencv-python==4.2.0.32
 PassportEye==1.2.4
 pdfminer==20140328
 Pillow==6.2.0
