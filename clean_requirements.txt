@@ -10,7 +10,7 @@ idna==2.7
 kiwisolver==1.0.1
 matplotlib==2.2.3
 networkx==2.2
-numpy==1.15.4
+numpy==1.22.0
 opencv-python==3.4.4.19
 PassportEye==1.2.4
 pdfminer==20140328
